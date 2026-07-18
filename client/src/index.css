@@ -1,0 +1,312 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Fraunces', 'Georgia', serif;
+  --font-hand: 'Caveat', cursive;
+  --font-body: 'Nunito', 'Segoe UI', sans-serif;
+
+  /* Deep dusk backdrop the corkboard hangs against */
+  --color-night-950: #101a1c;
+  --color-night-900: #142325;
+  --color-night-800: #1b2f31;
+  --color-night-700: #233d3f;
+  --color-night-600: #2f4f50;
+
+  /* Cork board wood + surface tones */
+  --color-cork-900: #4a3120;
+  --color-cork-800: #6b4527;
+  --color-cork-700: #8a5c34;
+  --color-cork-600: #a8713f;
+  --color-cork-500: #c08c53;
+  --color-cork-400: #d3a56f;
+  --color-cork-300: #e4bf8e;
+
+  --color-paper: #fbf6ec;
+  --color-ink: #241a12;
+  --color-ink-soft: #4a3c2e;
+
+  /* Brand accent — warm brass, not purple */
+  --color-brass-500: #d9a544;
+  --color-brass-600: #c48a2e;
+  --color-brass-400: #e6bd6e;
+
+  /* Mood palette (fallback preview — server owns the source of truth per note) */
+  --color-mood-happy: #ffe066;
+  --color-mood-calm: #a8dadc;
+  --color-mood-tired: #cdb4db;
+  --color-mood-stressed: #f4a261;
+  --color-mood-sad: #90caf9;
+  --color-mood-excited: #ff9f1c;
+  --color-mood-angry: #e63946;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  html[data-locale='th'] {
+    --font-body: 'Prompt', 'Nunito', 'Segoe UI', sans-serif;
+    --font-hand: 'Prompt', 'Caveat', cursive;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    background: var(--color-night-950);
+    color: var(--color-paper);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+}
+
+/* Corkboard texture — layered radial specks + subtle grain, no image asset needed */
+.cork-texture {
+  background-color: var(--color-cork-600);
+  background-image:
+    radial-gradient(circle at 8% 22%, rgba(74, 49, 32, 0.35) 0, transparent 2.4%),
+    radial-gradient(circle at 24% 68%, rgba(74, 49, 32, 0.3) 0, transparent 2%),
+    radial-gradient(circle at 42% 12%, rgba(74, 49, 32, 0.28) 0, transparent 1.8%),
+    radial-gradient(circle at 63% 44%, rgba(74, 49, 32, 0.32) 0, transparent 2.2%),
+    radial-gradient(circle at 81% 78%, rgba(74, 49, 32, 0.3) 0, transparent 2%),
+    radial-gradient(circle at 91% 18%, rgba(74, 49, 32, 0.26) 0, transparent 1.6%),
+    radial-gradient(circle at 15% 88%, rgba(74, 49, 32, 0.24) 0, transparent 1.8%),
+    radial-gradient(circle at 55% 92%, rgba(74, 49, 32, 0.28) 0, transparent 2%),
+    radial-gradient(circle at 33% 40%, rgba(216, 166, 108, 0.35) 0, transparent 3%),
+    radial-gradient(circle at 72% 60%, rgba(216, 166, 108, 0.3) 0, transparent 2.6%),
+    linear-gradient(160deg, var(--color-cork-500) 0%, var(--color-cork-700) 100%);
+  background-size:
+    140px 140px, 160px 160px, 120px 120px, 150px 150px, 130px 130px,
+    145px 145px, 155px 155px, 135px 135px, 220px 220px, 200px 200px, 100% 100%;
+}
+
+.wood-frame {
+  border-width: 14px;
+  border-style: solid;
+  border-image: linear-gradient(
+      135deg,
+      var(--color-cork-900),
+      var(--color-cork-700) 40%,
+      var(--color-cork-900) 60%,
+      var(--color-cork-800)
+    )
+    1;
+  box-shadow:
+    0 20px 60px -20px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.25);
+}
+
+.pin-shadow {
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.35));
+}
+
+.postit-shadow {
+  box-shadow:
+    0 10px 18px -6px rgba(20, 12, 4, 0.35),
+    0 2px 4px rgba(20, 12, 4, 0.2);
+}
+
+::selection {
+  background: var(--color-brass-500);
+  color: var(--color-ink);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 999px;
+}
+
+/* Auth scene — dusk room with soft cork glow + drifting mood scraps */
+.auth-scene {
+  background:
+    radial-gradient(ellipse 80% 55% at 50% -10%, rgba(168, 113, 63, 0.28), transparent 55%),
+    radial-gradient(ellipse 45% 40% at 85% 80%, rgba(217, 165, 68, 0.12), transparent 50%),
+    radial-gradient(ellipse 40% 35% at 10% 70%, rgba(74, 49, 32, 0.45), transparent 55%),
+    linear-gradient(165deg, var(--color-night-950) 0%, var(--color-night-900) 48%, #0c1516 100%);
+}
+
+.auth-ambient {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.auth-glow {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: min(36rem, 90vw);
+  height: 22rem;
+  translate: -50% -40%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(168, 113, 63, 0.18), transparent 68%);
+  animation: auth-pulse 10s ease-in-out infinite;
+}
+
+.auth-cork-panel {
+  background-color: var(--color-cork-600);
+  background-image:
+    radial-gradient(circle at 12% 28%, rgba(74, 49, 32, 0.38) 0, transparent 2.2%),
+    radial-gradient(circle at 38% 62%, rgba(74, 49, 32, 0.32) 0, transparent 2%),
+    radial-gradient(circle at 72% 22%, rgba(74, 49, 32, 0.3) 0, transparent 1.8%),
+    radial-gradient(circle at 88% 74%, rgba(216, 166, 108, 0.28) 0, transparent 2.4%),
+    linear-gradient(155deg, var(--color-cork-500) 0%, var(--color-cork-700) 100%);
+  opacity: 0.55;
+  box-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.65);
+}
+
+.auth-drift {
+  position: absolute;
+  display: block;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 2px;
+  opacity: 0.22;
+  box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.45);
+  animation: auth-float 14s ease-in-out infinite;
+}
+
+.auth-drift-a {
+  top: 14%;
+  left: 8%;
+  background: var(--color-mood-calm);
+  transform: rotate(-8deg);
+  animation-delay: 0s;
+}
+
+.auth-drift-b {
+  top: 22%;
+  right: 10%;
+  width: 3.6rem;
+  height: 3.6rem;
+  background: var(--color-mood-happy);
+  transform: rotate(6deg);
+  animation-delay: -4s;
+  animation-duration: 16s;
+}
+
+.auth-drift-c {
+  bottom: 16%;
+  left: 14%;
+  width: 3.2rem;
+  height: 3.2rem;
+  background: var(--color-mood-tired);
+  transform: rotate(12deg);
+  animation-delay: -7s;
+  animation-duration: 18s;
+}
+
+.auth-drift-d {
+  bottom: 22%;
+  right: 12%;
+  width: 2.8rem;
+  height: 2.8rem;
+  background: var(--color-mood-excited);
+  transform: rotate(-14deg);
+  animation-delay: -2s;
+  animation-duration: 15s;
+}
+
+@keyframes auth-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -14px;
+  }
+}
+
+@keyframes auth-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    scale: 1;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.04;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-drift,
+  .auth-glow {
+    animation: none;
+  }
+}
+
+.auth-label {
+  margin-bottom: 0.25rem;
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+.auth-input {
+  width: 100%;
+  border-radius: 2px;
+  border: 1px solid rgba(36, 26, 18, 0.14);
+  background: #fffef9;
+  padding: 0.55rem 0.75rem;
+  color: var(--color-ink);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.auth-input:focus {
+  border-color: var(--color-cork-700);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(138, 92, 52, 0.18);
+}
+
+.auth-input:read-only {
+  background: rgba(36, 26, 18, 0.05);
+  color: var(--color-ink-soft);
+}
+
+.auth-btn-primary {
+  width: 100%;
+  border-radius: 2px;
+  background: var(--color-cork-800);
+  padding: 0.7rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-paper);
+  transition: background 0.15s ease;
+}
+
+.auth-btn-primary:hover:not(:disabled) {
+  background: var(--color-cork-700);
+}
+
+.auth-btn-primary:disabled {
+  opacity: 0.6;
+}
+
+.auth-btn-secondary {
+  width: 100%;
+  border-radius: 2px;
+  border: 1.5px solid var(--color-cork-800);
+  background: #fffef9;
+  padding: 0.7rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-cork-800);
+  transition: background 0.15s ease;
+}
+
+.auth-btn-secondary:hover {
+  background: rgba(107, 69, 39, 0.06);
+}
