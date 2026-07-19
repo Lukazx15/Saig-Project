@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react'
 import * as moodsApi from '@/api/moods'
+import { useAuth } from '@/context/AuthContext'
 import type { ComposeMoodFormValues } from '@/lib/schemas'
 import type { MoodFilters, MoodNote, PaginationMeta } from '@/types'
 
@@ -40,6 +41,7 @@ interface MoodContextValue {
 const MoodContext = createContext<MoodContextValue | null>(null)
 
 export function MoodProvider({ children }: { children: ReactNode }) {
+  const { user, isBootstrapping } = useAuth()
   const [moods, setMoods] = useState<MoodNote[]>([])
   const [pagination, setPagination] = useState<PaginationMeta>({
     page: 1,
@@ -70,10 +72,14 @@ export function MoodProvider({ children }: { children: ReactNode }) {
     }
   }, [filters])
 
+  // Wait for auth bootstrap (SSO redirect sets the refresh cookie, then
+  // bootstrapSession installs the access token). Ownership flags
+  // (canEdit/canDelete) only come back when the list request has a Bearer
+  // token — re-fetch when session user changes after login/logout too.
   useEffect(() => {
-    refresh()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters])
+    if (isBootstrapping) return
+    void refresh()
+  }, [filters, isBootstrapping, user?.id, refresh])
 
   const setFilters = useCallback((patch: Partial<MoodFilters>) => {
     setFiltersState((prev) => ({

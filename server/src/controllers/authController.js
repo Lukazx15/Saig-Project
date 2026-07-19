@@ -6,6 +6,7 @@ const env = require('../config/env');
 const { generateAlias } = require('../services/aliasService');
 const { verifyStudent } = require('../services/kmitlVerify');
 const kmitlOidc = require('../services/kmitlOidc');
+const { normalizeFacultyMajor } = require('../config/kmitlCatalog');
 const {
   signAccessToken,
   signRefreshToken,
@@ -67,14 +68,25 @@ const register = asyncHandler(async (req, res) => {
     }
   }
 
+  let canonical;
+  try {
+    canonical = normalizeFacultyMajor(faculty, major);
+  } catch (err) {
+    throw ApiError.badRequest('Invalid faculty or major', {
+      reason: err.message,
+      faculty,
+      major,
+    });
+  }
+
   const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
   const user = await User.create({
     studentId,
     email: normalizedEmail,
     passwordHash,
-    faculty,
-    major,
+    faculty: canonical.faculty,
+    major: canonical.major,
     year,
     alias: generateAlias(),
     kmitlVerified: true,
@@ -256,6 +268,20 @@ const kmitlSsoCallback = asyncHandler(async (req, res) => {
       user.kmitlVerified = true;
       user.verificationMethod = 'sso';
     }
+
+    // Re-map legacy English / broad-major labels onto the Thai catalog so
+    // returning SSO users stop splitting stats by language.
+    const remapped = normalizeFacultyMajor(user.faculty, user.major, { soft: true });
+    if (remapped.ok && (remapped.faculty !== user.faculty || remapped.major !== user.major)) {
+      user.faculty = remapped.faculty;
+      user.major = remapped.major;
+    } else if (!remapped.ok) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[kmitlSso] Could not normalize faculty/major for ${user.studentId}: ${remapped.reason}`
+      );
+    }
+
     await issueSession(res, user);
     return res.redirect(`${clientUrl}/?sso=success`);
   }

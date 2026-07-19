@@ -1,64 +1,12 @@
-import type { MoodType } from '@/types'
-import { MOOD_TYPES } from '@/types'
-
-export const MOOD_META: Record<
-  MoodType,
-  { label: string; emoji: string; color: string; tint: string }
-> = {
-  happy: {
-    label: 'Happy',
-    emoji: '😊',
-    color: '#FFE066',
-    tint: 'rgba(255, 224, 102, 0.35)',
-  },
-  calm: {
-    label: 'Calm',
-    emoji: '🌿',
-    color: '#A8DADC',
-    tint: 'rgba(168, 218, 220, 0.38)',
-  },
-  tired: {
-    label: 'Tired',
-    emoji: '😴',
-    color: '#CDB4DB',
-    tint: 'rgba(205, 180, 219, 0.4)',
-  },
-  stressed: {
-    label: 'Stressed',
-    emoji: '😰',
-    color: '#F4A261',
-    tint: 'rgba(244, 162, 97, 0.35)',
-  },
-  sad: {
-    label: 'Sad',
-    emoji: '😔',
-    color: '#90CAF9',
-    tint: 'rgba(144, 202, 249, 0.38)',
-  },
-  excited: {
-    label: 'Excited',
-    emoji: '✨',
-    color: '#FF9F1C',
-    tint: 'rgba(255, 159, 28, 0.35)',
-  },
-  angry: {
-    label: 'Angry',
-    emoji: '😤',
-    color: '#E63946',
-    tint: 'rgba(230, 57, 70, 0.35)',
-  },
-}
-
 /**
- * Faculty + bachelor majors from KMITL OAQ curriculum page.
- * Source: https://office.kmitl.ac.th/oaq/curriculum
- * (ปริญญาตรี / bachelor programs only; degree prefixes stripped for UI)
+ * Canonical Thai faculty/major catalog (mirrors client/src/lib/moods.ts).
+ * English / broad-program aliases map into these keys so SSO and register
+ * users share one string for filters + stats.
  *
- * These Thai strings are the canonical values stored in MongoDB.
- * The server maps English / broad SSO-style labels (e.g. "Engineering",
- * "Computer Engineering") onto these keys — see server/src/config/kmitlCatalog.js.
+ * Source: https://office.kmitl.ac.th/oaq/curriculum
  */
-export const KMITL_MAJORS_BY_FACULTY = {
+
+const MAJORS_BY_FACULTY = {
   คณะวิศวกรรมศาสตร์: [
     'วิศวกรรมอาหาร',
     'วิศวกรรมสารสนเทศ',
@@ -241,53 +189,164 @@ export const KMITL_MAJORS_BY_FACULTY = {
     'อนุปริญญา วิศวกรรมแมคคาทรอนิกส์',
   ],
   คณะพยาบาลศาสตร์: ['พยาบาลศาสตรบัณฑิต'],
-} as const satisfies Record<string, readonly string[]>
+};
 
-export type KmitlFaculty = keyof typeof KMITL_MAJORS_BY_FACULTY
+/** Seed/admin accounts that are not in the student catalog. */
+const EXTRA_ALLOWED = {
+  Administration: ['Administration', 'Platform'],
+};
 
-export const KMITL_FACULTIES = Object.keys(KMITL_MAJORS_BY_FACULTY) as KmitlFaculty[]
+function normalizeKey(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+}
 
-/** Flat unique major list across all faculties (stable order). */
-export const KMITL_ALL_MAJORS: readonly string[] = Array.from(
-  new Set(KMITL_FACULTIES.flatMap((faculty) => [...KMITL_MAJORS_BY_FACULTY[faculty]])),
-)
+// English / short labels → canonical Thai faculty
+const FACULTY_ALIASES = {
+  engineering: 'คณะวิศวกรรมศาสตร์',
+  'faculty of engineering': 'คณะวิศวกรรมศาสตร์',
+  science: 'คณะวิทยาศาสตร์',
+  'faculty of science': 'คณะวิทยาศาสตร์',
+  architecture: 'คณะสถาปัตยกรรม ศิลปะและการออกแบบ',
+  'architecture art and design': 'คณะสถาปัตยกรรม ศิลปะและการออกแบบ',
+  'faculty of architecture': 'คณะสถาปัตยกรรม ศิลปะและการออกแบบ',
+  'information technology': 'คณะเทคโนโลยีสารสนเทศ',
+  it: 'คณะเทคโนโลยีสารสนเทศ',
+  'business administration': 'คณะบริหารธุรกิจ',
+  business: 'คณะบริหารธุรกิจ',
+  'agricultural technology': 'คณะเทคโนโลยีการเกษตร',
+  agriculture: 'คณะเทคโนโลยีการเกษตร',
+  'food industry': 'คณะอุตสาหกรรมอาหาร',
+  'industrial education': 'คณะครุศาสตร์อุตสาหกรรมและเทคโนโลยี',
+  'liberal arts': 'คณะศิลปศาสตร์',
+  medicine: 'คณะแพทยศาสตร์',
+  dentistry: 'คณะทันตแพทยศาสตร์',
+  nursing: 'คณะพยาบาลศาสตร์',
+  chumphon: 'วิทยาเขตชุมพรเขตรอุดมศักดิ์',
+};
 
-export function majorsForFaculty(faculty: string): readonly string[] {
-  if (faculty in KMITL_MAJORS_BY_FACULTY) {
-    return KMITL_MAJORS_BY_FACULTY[faculty as KmitlFaculty]
+// Broad EN program names → Thai major (validated against the resolved faculty)
+const MAJOR_ALIASES = {
+  'computer engineering': 'วิศวกรรมคอมพิวเตอร์',
+  'computer engineering and cyber security': 'วิศวกรรมคอมพิวเตอร์และความปลอดภัยไซเบอร์',
+  'computer engineering and cybersecurity': 'วิศวกรรมคอมพิวเตอร์และความปลอดภัยไซเบอร์',
+  'software engineering': 'วิศวกรรมซอฟต์แวร์ (นานาชาติ)',
+  'electrical engineering': 'วิศวกรรมไฟฟ้า',
+  'mechanical engineering': 'วิศวกรรมเครื่องกล',
+  'civil engineering': 'วิศวกรรมโยธา',
+  'chemical engineering': 'วิศวกรรมเคมี',
+  'industrial engineering': 'วิศวกรรมอุตสาหการ',
+  'electronics engineering': 'วิศวกรรมอิเล็กทรอนิกส์',
+  'telecommunications engineering': 'วิศวกรรมโทรคมนาคม',
+  'information engineering': 'วิศวกรรมสารสนเทศ',
+  'computer science': 'วิทยาการคอมพิวเตอร์',
+  'information technology': 'เทคโนโลยีสารสนเทศ',
+  'food science and technology': 'วิทยาศาสตร์และเทคโนโลยีการอาหาร',
+  physics: 'ฟิสิกส์ประยุกต์',
+  'applied physics': 'ฟิสิกส์ประยุกต์',
+  'industrial physics': 'ฟิสิกส์อุตสาหกรรม',
+  chemistry: 'เคมีอุตสาหกรรม',
+  'industrial chemistry': 'เคมีอุตสาหกรรม',
+  mathematics: 'คณิตศาสตร์ประยุกต์',
+  'applied mathematics': 'คณิตศาสตร์ประยุกต์',
+  ee: 'วิศวกรรมไฟฟ้า',
+  'e.e.': 'วิศวกรรมไฟฟ้า',
+  'film and digital media': 'ภาพยนตร์และดิจิทัล มีเดีย',
+  architecture: 'สถาปัตยกรรมหลัก (5 ปี)',
+  nursing: 'พยาบาลศาสตรบัณฑิต',
+};
+
+const FACULTY_BY_KEY = new Map();
+Object.keys(MAJORS_BY_FACULTY).forEach((faculty) => {
+  FACULTY_BY_KEY.set(normalizeKey(faculty), faculty);
+});
+Object.keys(EXTRA_ALLOWED).forEach((faculty) => {
+  FACULTY_BY_KEY.set(normalizeKey(faculty), faculty);
+});
+
+function resolveFaculty(faculty) {
+  const key = normalizeKey(faculty);
+  if (!key) return null;
+  if (FACULTY_BY_KEY.has(key)) return FACULTY_BY_KEY.get(key);
+  if (FACULTY_ALIASES[key]) return FACULTY_ALIASES[key];
+  return null;
+}
+
+function majorsForFaculty(faculty) {
+  if (MAJORS_BY_FACULTY[faculty]) return MAJORS_BY_FACULTY[faculty];
+  if (EXTRA_ALLOWED[faculty]) return EXTRA_ALLOWED[faculty];
+  return [];
+}
+
+function resolveMajor(faculty, major) {
+  const majors = majorsForFaculty(faculty);
+  const key = normalizeKey(major);
+  if (!key) return null;
+
+  const exact = majors.find((m) => normalizeKey(m) === key);
+  if (exact) return exact;
+
+  const aliased = MAJOR_ALIASES[key];
+  if (aliased) {
+    const inFaculty = majors.find((m) => normalizeKey(m) === normalizeKey(aliased));
+    if (inFaculty) return inFaculty;
   }
-  return KMITL_ALL_MAJORS
+
+  return null;
 }
 
-export function isMoodType(value: unknown): value is MoodType {
-  return typeof value === 'string' && (MOOD_TYPES as readonly string[]).includes(value)
-}
+/**
+ * Map faculty/major to canonical Thai catalog values.
+ * @param {string} faculty
+ * @param {string} major
+ * @param {{ soft?: boolean }} [options] soft=true returns { ok:false } instead of throwing shape
+ * @returns {{ ok: true, faculty: string, major: string } | { ok: false, reason: string, faculty: string, major: string }}
+ */
+function normalizeFacultyMajor(faculty, major, options = {}) {
+  const soft = Boolean(options.soft);
+  const inputFaculty = String(faculty || '').trim();
+  const inputMajor = String(major || '').trim();
 
-export function colorForMood(moodType: MoodType, override?: string): string {
-  if (override && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(override)) return override
-  return MOOD_META[moodType].color
-}
-
-/** Deterministic slight rotation from id for stable layout */
-export function rotationForId(id: string): number {
-  let hash = 0
-  for (let i = 0; i < id.length; i += 1) {
-    hash = (hash * 31 + id.charCodeAt(i)) | 0
+  const resolvedFaculty = resolveFaculty(inputFaculty);
+  if (!resolvedFaculty) {
+    const result = {
+      ok: false,
+      reason: `Unknown faculty: ${inputFaculty}`,
+      faculty: inputFaculty,
+      major: inputMajor,
+    };
+    if (soft) return result;
+    const err = new Error(result.reason);
+    err.code = 'INVALID_FACULTY_MAJOR';
+    err.details = result;
+    throw err;
   }
-  return ((hash % 11) - 5) * 0.9
+
+  const resolvedMajor = resolveMajor(resolvedFaculty, inputMajor);
+  if (!resolvedMajor) {
+    const result = {
+      ok: false,
+      reason: `Unknown major "${inputMajor}" for faculty "${resolvedFaculty}"`,
+      faculty: inputFaculty,
+      major: inputMajor,
+    };
+    if (soft) return result;
+    const err = new Error(result.reason);
+    err.code = 'INVALID_FACULTY_MAJOR';
+    err.details = result;
+    throw err;
+  }
+
+  return { ok: true, faculty: resolvedFaculty, major: resolvedMajor };
 }
 
-export function dominantFromDistribution(
-  distribution: Partial<Record<MoodType, number>>,
-): MoodType | null {
-  let best: MoodType | null = null
-  let max = 0
-  for (const mood of MOOD_TYPES) {
-    const count = distribution[mood] ?? 0
-    if (count > max) {
-      max = count
-      best = mood
-    }
-  }
-  return max > 0 ? best : null
-}
+module.exports = {
+  MAJORS_BY_FACULTY,
+  FACULTY_ALIASES,
+  MAJOR_ALIASES,
+  normalizeFacultyMajor,
+  resolveFaculty,
+  majorsForFaculty,
+};
