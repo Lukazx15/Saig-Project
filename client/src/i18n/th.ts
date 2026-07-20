@@ -53,9 +53,12 @@ export const th: Messages = {
   resetBackToLogin: 'กลับไปเข้าสู่ระบบ',
 
   registerTitle: 'มาอยู่บนกระดานกัน',
+  registerTitleSso: 'เลือกคณะและสาขา',
   registerSubtitle: 'เปิดให้นักศึกษา KMITL ที่ยืนยันตัวตนแล้ว โพสต์แบบไม่โชว์ชื่อจริง',
-  registerSubtitleSso: 'ยืนยันตัวตนกับ KMITL แล้ว เหลือแค่เติมโปรไฟล์ให้ครบ',
-  registerSsoBanner: 'ผ่าน KMITL SSO แล้ว รหัสนักศึกษาและอีเมลจะผูกกับบัญชีนี้',
+  registerSubtitleSso:
+    'ยืนยันตัวตนกับ KMITL แล้ว — เลือกคณะและสาขาให้ถูกต้องก่อนเข้ากระดาน',
+  registerSsoBanner:
+    'ผ่าน KMITL SSO แล้ว รหัสนักศึกษาและอีเมลถูกล็อกไว้ — กรุณาเลือกคณะและสาขาของคุณ',
   registerEmail: 'อีเมล KMITL',
   registerFaculty: 'คณะ',
   registerYear: 'ชั้นปี',
@@ -65,6 +68,7 @@ export const th: Messages = {
   registerSelect: 'เลือก…',
   registerYearOption: 'ปี {n}',
   registerSubmit: 'สมัครสมาชิก',
+  registerSubmitSso: 'บันทึกสาขาแล้วเข้ากระดาน',
   registerSubmitting: 'กำลังสมัคร…',
   registerFailed: 'สมัครไม่สำเร็จ',
   registerAlready: 'มีบัญชีอยู่แล้ว',
@@ -72,6 +76,16 @@ export const th: Messages = {
   registerMajorPlaceholder: 'วิศวกรรมคอมพิวเตอร์',
   registerSelectMajor: 'เลือกสาขา…',
   registerSelectFacultyFirst: 'เลือกคณะก่อน…',
+
+  completeProfileTitle: 'ยืนยันคณะและสาขา',
+  completeProfileSubtitle: 'เลือกคณะและสาขาให้ถูกต้องเพื่อให้กระดานแสดงผลถูก',
+  completeProfileSubtitleSso:
+    'เข้าสู่ระบบด้วย KMITL แล้ว — เลือกคณะและสาขาก่อนเข้ากระดาน',
+  completeProfileSsoBanner:
+    'SSO ไม่มีข้อมูลสาขา กรุณายืนยันคณะ สาขา และชั้นปีด้วยตนเอง',
+  completeProfileSubmit: 'ไปที่กระดาน',
+  completeProfileSubmitting: 'กำลังบันทึก…',
+  completeProfileFailed: 'บันทึกคณะและสาขาไม่สำเร็จ',
 
   boardTitle: 'วันนี้สาขามู้ดไหน?',
   boardSubtitle: 'โน้ตอารมณ์ไม่ระบุชื่อจากเพื่อนใน KMITL — จะปักเองหรือแอบอ่านก็ได้',

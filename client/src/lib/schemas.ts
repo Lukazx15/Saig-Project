@@ -44,6 +44,16 @@ export const registerSchema = z
     },
   )
 
+export const completeProfileSchema = z.object({
+  faculty: z.string().trim().min(1, 'Select a faculty'),
+  major: z.string().trim().min(2, 'Major is required'),
+  year: z
+    .number()
+    .int()
+    .min(1, 'Year must be 1–8')
+    .max(8, 'Year must be 1–8'),
+})
+
 export const composeMoodSchema = z.object({
   moodType: z.enum(MOOD_TYPES),
   message: z
@@ -88,6 +98,7 @@ export const resetPasswordSchema = z
 
 export type LoginFormValues = z.infer<typeof loginSchema>
 export type RegisterFormValues = z.infer<typeof registerSchema>
+export type CompleteProfileFormValues = z.infer<typeof completeProfileSchema>
 export type ComposeMoodFormValues = z.infer<typeof composeMoodSchema>
 export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
 export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>

@@ -6,6 +6,7 @@ import type {
   LoginFormValues,
   RegisterFormValues,
   ResetPasswordFormValues,
+  CompleteProfileFormValues,
 } from '@/lib/schemas'
 
 async function applyAuth(raw: unknown): Promise<AuthResponse> {
@@ -159,6 +160,21 @@ export async function fetchCurrentUser(): Promise<User | null> {
     }
   }
   return null
+}
+
+export async function completeProfile(
+  values: CompleteProfileFormValues,
+): Promise<User> {
+  try {
+    const { data } = await api.patch('/auth/profile', {
+      faculty: values.faculty,
+      major: values.major,
+      year: values.year,
+    })
+    return normalizeUser(data)
+  } catch (err) {
+    throw new Error(getErrorMessage(err, 'Could not save your faculty and major'))
+  }
 }
 
 /** Restore session from httpOnly refresh cookie; returns user or null. */

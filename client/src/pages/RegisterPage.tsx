@@ -50,10 +50,126 @@ export function RegisterPage() {
     }
   }
 
+  const identityFields = (
+    <>
+      <div>
+        <label className="auth-label" htmlFor="register-student-id">
+          {t('loginStudentId')}
+        </label>
+        <input
+          {...register('studentId')}
+          id="register-student-id"
+          type="text"
+          inputMode="numeric"
+          placeholder="65010001"
+          readOnly={Boolean(ssoIdentity)}
+          autoComplete="username"
+          className="auth-input"
+        />
+        {errors.studentId && (
+          <p className="mt-1 text-xs text-red-700">{errors.studentId.message}</p>
+        )}
+      </div>
+
+      <div>
+        <label className="auth-label" htmlFor="register-email">
+          {t('registerEmail')}
+        </label>
+        <input
+          {...register('email')}
+          id="register-email"
+          type="email"
+          placeholder="65010001@kmitl.ac.th"
+          readOnly={Boolean(ssoIdentity)}
+          autoComplete="email"
+          className="auth-input"
+        />
+        {errors.email && <p className="mt-1 text-xs text-red-700">{errors.email.message}</p>}
+      </div>
+    </>
+  )
+
+  const majorFields = (
+    <>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div>
+          <label className="auth-label" htmlFor="register-faculty">
+            {t('registerFaculty')}
+          </label>
+          <select
+            {...register('faculty', {
+              onChange: () => setValue('major', ''),
+            })}
+            id="register-faculty"
+            defaultValue=""
+            className="auth-input"
+          >
+            <option value="" disabled>
+              {t('registerSelect')}
+            </option>
+            {KMITL_FACULTIES.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+          {errors.faculty && (
+            <p className="mt-1 text-xs text-red-700">{errors.faculty.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="auth-label" htmlFor="register-year">
+            {t('registerYear')}
+          </label>
+          <select
+            {...register('year', { valueAsNumber: true })}
+            id="register-year"
+            defaultValue=""
+            className="auth-input"
+          >
+            <option value="" disabled>
+              {t('registerSelect')}
+            </option>
+            {[1, 2, 3, 4, 5, 6].map((y) => (
+              <option key={y} value={y}>
+                {t('registerYearOption', { n: y })}
+              </option>
+            ))}
+          </select>
+          {errors.year && <p className="mt-1 text-xs text-red-700">{errors.year.message}</p>}
+        </div>
+      </div>
+
+      <div>
+        <label className="auth-label" htmlFor="register-major">
+          {t('registerMajor')}
+        </label>
+        <select
+          {...register('major')}
+          id="register-major"
+          defaultValue=""
+          disabled={!selectedFaculty}
+          className="auth-input"
+        >
+          <option value="" disabled>
+            {selectedFaculty ? t('registerSelectMajor') : t('registerSelectFacultyFirst')}
+          </option>
+          {majorChoices.map((major) => (
+            <option key={major} value={major}>
+              {major}
+            </option>
+          ))}
+        </select>
+        {errors.major && <p className="mt-1 text-xs text-red-700">{errors.major.message}</p>}
+      </div>
+    </>
+  )
+
   return (
     <Layout variant="auth">
       <AuthCard
-        title={t('registerTitle')}
+        title={ssoIdentity ? t('registerTitleSso') : t('registerTitle')}
         subtitle={ssoIdentity ? t('registerSubtitleSso') : t('registerSubtitle')}
         footer={
           <>
@@ -74,113 +190,18 @@ export function RegisterPage() {
             </p>
           )}
 
-          <div>
-            <label className="auth-label" htmlFor="register-student-id">
-              {t('loginStudentId')}
-            </label>
-            <input
-              {...register('studentId')}
-              id="register-student-id"
-              type="text"
-              inputMode="numeric"
-              placeholder="65010001"
-              readOnly={Boolean(ssoIdentity)}
-              autoComplete="username"
-              className="auth-input"
-            />
-            {errors.studentId && (
-              <p className="mt-1 text-xs text-red-700">{errors.studentId.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="auth-label" htmlFor="register-email">
-              {t('registerEmail')}
-            </label>
-            <input
-              {...register('email')}
-              id="register-email"
-              type="email"
-              placeholder="65010001@kmitl.ac.th"
-              readOnly={Boolean(ssoIdentity)}
-              autoComplete="email"
-              className="auth-input"
-            />
-            {errors.email && <p className="mt-1 text-xs text-red-700">{errors.email.message}</p>}
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label className="auth-label" htmlFor="register-faculty">
-                {t('registerFaculty')}
-              </label>
-              <select
-                {...register('faculty', {
-                  onChange: () => setValue('major', ''),
-                })}
-                id="register-faculty"
-                defaultValue=""
-                className="auth-input"
-              >
-                <option value="" disabled>
-                  {t('registerSelect')}
-                </option>
-                {KMITL_FACULTIES.map((f) => (
-                  <option key={f} value={f}>
-                    {f}
-                  </option>
-                ))}
-              </select>
-              {errors.faculty && (
-                <p className="mt-1 text-xs text-red-700">{errors.faculty.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="auth-label" htmlFor="register-year">
-                {t('registerYear')}
-              </label>
-              <select
-                {...register('year', { valueAsNumber: true })}
-                id="register-year"
-                defaultValue=""
-                className="auth-input"
-              >
-                <option value="" disabled>
-                  {t('registerSelect')}
-                </option>
-                {[1, 2, 3, 4, 5, 6].map((y) => (
-                  <option key={y} value={y}>
-                    {t('registerYearOption', { n: y })}
-                  </option>
-                ))}
-              </select>
-              {errors.year && <p className="mt-1 text-xs text-red-700">{errors.year.message}</p>}
-            </div>
-          </div>
-
-          <div>
-            <label className="auth-label" htmlFor="register-major">
-              {t('registerMajor')}
-            </label>
-            <select
-              {...register('major')}
-              id="register-major"
-              defaultValue=""
-              disabled={!selectedFaculty}
-              className="auth-input"
-            >
-              <option value="" disabled>
-                {selectedFaculty ? t('registerSelectMajor') : t('registerSelectFacultyFirst')}
-              </option>
-              {majorChoices.map((major) => (
-                <option key={major} value={major}>
-                  {major}
-                </option>
-              ))}
-            </select>
-            {errors.major && <p className="mt-1 text-xs text-red-700">{errors.major.message}</p>}
-          </div>
+          {/* After SSO, faculty/major come first — identity is already locked. */}
+          {ssoIdentity ? (
+            <>
+              {majorFields}
+              {identityFields}
+            </>
+          ) : (
+            <>
+              {identityFields}
+              {majorFields}
+            </>
+          )}
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
@@ -220,7 +241,11 @@ export function RegisterPage() {
           )}
 
           <button type="submit" disabled={isSubmitting} className="auth-btn-primary">
-            {isSubmitting ? t('registerSubmitting') : t('registerSubmit')}
+            {isSubmitting
+              ? t('registerSubmitting')
+              : ssoIdentity
+                ? t('registerSubmitSso')
+                : t('registerSubmit')}
           </button>
         </form>
       </AuthCard>

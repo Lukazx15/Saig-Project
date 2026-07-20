@@ -7,9 +7,9 @@ interface GuestRouteProps {
   children: ReactNode
 }
 
-/** Guest-only routes: authenticated users are sent to the board. */
+/** Guest-only routes: authenticated users are sent to the board (or profile setup). */
 export function GuestRoute({ children }: GuestRouteProps) {
-  const { isAuthenticated, isBootstrapping } = useAuth()
+  const { isAuthenticated, needsProfileCompletion, isBootstrapping } = useAuth()
   const { t } = useLocale()
 
   if (isBootstrapping) {
@@ -23,7 +23,9 @@ export function GuestRoute({ children }: GuestRouteProps) {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />
+    return (
+      <Navigate to={needsProfileCompletion ? '/complete-profile' : '/'} replace />
+    )
   }
 
   return <>{children}</>

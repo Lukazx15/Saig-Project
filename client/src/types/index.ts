@@ -22,6 +22,8 @@ export interface User {
   role: UserRole
   alias?: string
   kmitlVerified?: boolean
+  /** True until the user explicitly confirms faculty/major (e.g. after SSO). */
+  needsProfileCompletion?: boolean
 }
 
 export interface MoodNote {

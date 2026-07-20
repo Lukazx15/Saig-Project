@@ -28,7 +28,11 @@ export function LoginPage() {
   async function onSubmit(values: LoginFormValues) {
     setSubmitError(null)
     try {
-      await login(values)
+      const loggedIn = await login(values)
+      if (loggedIn.needsProfileCompletion) {
+        navigate('/complete-profile', { replace: true })
+        return
+      }
       const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/'
       navigate(from, { replace: true })
     } catch (err) {
