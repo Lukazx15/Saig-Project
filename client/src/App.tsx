@@ -7,6 +7,7 @@ import { GuestRoute } from '@/components/GuestRoute'
 import { BoardPage } from '@/pages/BoardPage'
 import { LoginPage } from '@/pages/LoginPage'
 import { RegisterPage } from '@/pages/RegisterPage'
+import { CompleteProfilePage } from '@/pages/CompleteProfilePage'
 import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage'
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { StatsPage } from '@/pages/StatsPage'
@@ -16,9 +17,10 @@ import { NotFoundPage } from '@/pages/NotFoundPage'
 /**
  * Routing model:
  * - Unauthenticated `/` → redirect to `/login` (via ProtectedRoute)
- * - Authenticated `/` → board
- * - Authenticated `/login` | `/register` → redirect to board (via GuestRoute)
- * - After login/register/SSO → navigate to `/` (board)
+ * - Authenticated `/` → board (or `/complete-profile` if faculty/major pending)
+ * - Authenticated `/login` | `/register` → redirect to board / complete-profile
+ * - After SSO (existing user) → `/complete-profile?sso=1`
+ * - After SSO (new user) → `/register?ssoTicket=…`
  */
 function App() {
   return (
@@ -48,6 +50,14 @@ function App() {
                 <GuestRoute>
                   <RegisterPage />
                 </GuestRoute>
+              }
+            />
+            <Route
+              path="/complete-profile"
+              element={
+                <ProtectedRoute allowIncompleteProfile>
+                  <CompleteProfilePage />
+                </ProtectedRoute>
               }
             />
             <Route

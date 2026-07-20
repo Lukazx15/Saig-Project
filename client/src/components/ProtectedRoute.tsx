@@ -6,10 +6,16 @@ import { useLocale } from '@/context/LocaleContext'
 interface ProtectedRouteProps {
   children: ReactNode
   requireAdmin?: boolean
+  /** Allow this route even when faculty/major still need confirmation. */
+  allowIncompleteProfile?: boolean
 }
 
-export function ProtectedRoute({ children, requireAdmin }: ProtectedRouteProps) {
-  const { isAuthenticated, isAdmin, isBootstrapping } = useAuth()
+export function ProtectedRoute({
+  children,
+  requireAdmin,
+  allowIncompleteProfile = false,
+}: ProtectedRouteProps) {
+  const { isAuthenticated, isAdmin, needsProfileCompletion, isBootstrapping } = useAuth()
   const { t } = useLocale()
   const location = useLocation()
 
@@ -29,6 +35,10 @@ export function ProtectedRoute({ children, requireAdmin }: ProtectedRouteProps) 
 
   if (requireAdmin && !isAdmin) {
     return <Navigate to="/" replace />
+  }
+
+  if (needsProfileCompletion && !allowIncompleteProfile) {
+    return <Navigate to="/complete-profile" replace />
   }
 
   return <>{children}</>

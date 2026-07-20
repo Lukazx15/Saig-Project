@@ -50,9 +50,12 @@ export const en: Messages = {
   resetBackToLogin: 'Back to sign in',
 
   registerTitle: 'Join the board',
+  registerTitleSso: 'Select your major',
   registerSubtitle: 'Verified KMITL students only — your identity stays anonymous.',
-  registerSubtitleSso: 'Your KMITL identity is verified — just finish setting up your profile.',
-  registerSsoBanner: 'KMITL SSO verified — student ID and email are locked to your account.',
+  registerSubtitleSso:
+    'Your KMITL identity is verified. Choose your faculty and major so notes show the right board.',
+  registerSsoBanner:
+    'KMITL SSO verified — student ID and email are locked. Please select your faculty and major.',
   registerEmail: 'KMITL Email',
   registerFaculty: 'Faculty',
   registerYear: 'Year',
@@ -62,6 +65,7 @@ export const en: Messages = {
   registerSelect: 'Select…',
   registerYearOption: 'Year {n}',
   registerSubmit: 'Create account',
+  registerSubmitSso: 'Save major & join',
   registerSubmitting: 'Creating account…',
   registerFailed: 'Registration failed',
   registerAlready: 'Already a member?',
@@ -69,6 +73,16 @@ export const en: Messages = {
   registerMajorPlaceholder: 'Computer Engineering',
   registerSelectMajor: 'Select major…',
   registerSelectFacultyFirst: 'Select faculty first…',
+
+  completeProfileTitle: 'Confirm your major',
+  completeProfileSubtitle: 'Choose your faculty and major so the board stays accurate.',
+  completeProfileSubtitleSso:
+    'Signed in with KMITL — select your faculty and major before opening the board.',
+  completeProfileSsoBanner:
+    'SSO does not include your major. Please confirm faculty, major, and year.',
+  completeProfileSubmit: 'Continue to board',
+  completeProfileSubmitting: 'Saving…',
+  completeProfileFailed: 'Could not save your faculty and major',
 
   boardTitle: "How's the major feeling today?",
   boardSubtitle: 'Anonymous mood notes from KMITL students — pin one, or just read the board.',

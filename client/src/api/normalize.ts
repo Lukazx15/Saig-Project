@@ -60,6 +60,10 @@ export function normalizeUser(raw: unknown): User {
     role,
     alias: pickString(src.alias) || undefined,
     kmitlVerified: pickBool(src.kmitlVerified),
+    needsProfileCompletion: pickBool(
+      src.needsProfileCompletion,
+      src.needs_profile_completion,
+    ),
   }
 }
 
