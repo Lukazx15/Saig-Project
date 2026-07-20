@@ -60,6 +60,9 @@ const register = asyncHandler(async (req, res) => {
     if (attested.studentId !== studentId || attested.email !== normalizedEmail) {
       throw ApiError.badRequest('Submitted identity does not match the KMITL SSO login');
     }
+    if (attested.year != null && Number(year) !== attested.year) {
+      throw ApiError.badRequest('Submitted year of study does not match the KMITL SSO login');
+    }
     verification = { verified: true, method: 'sso' };
   } else {
     verification = await verifyStudent({ studentId, email: normalizedEmail, year });

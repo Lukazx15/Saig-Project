@@ -33,12 +33,18 @@ export function RegisterPage() {
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: ssoIdentity
-      ? { studentId: ssoIdentity.studentId, email: ssoIdentity.email }
+      ? {
+          studentId: ssoIdentity.studentId,
+          email: ssoIdentity.email,
+          ...(ssoIdentity.year != null ? { year: ssoIdentity.year } : {}),
+        }
       : undefined,
   })
 
   const selectedFaculty = watch('faculty') || ''
+  const selectedYear = watch('year')
   const majorChoices = selectedFaculty ? majorsForFaculty(selectedFaculty) : []
+  const yearLocked = Boolean(ssoIdentity && ssoIdentity.year != null)
 
   async function onSubmit(values: RegisterFormValues) {
     setSubmitError(null)
@@ -140,21 +146,40 @@ export function RegisterPage() {
               <label className="auth-label" htmlFor="register-year">
                 {t('registerYear')}
               </label>
-              <select
-                {...register('year', { valueAsNumber: true })}
-                id="register-year"
-                defaultValue=""
-                className="auth-input"
-              >
-                <option value="" disabled>
-                  {t('registerSelect')}
-                </option>
-                {[1, 2, 3, 4, 5, 6].map((y) => (
-                  <option key={y} value={y}>
-                    {t('registerYearOption', { n: y })}
+              {yearLocked ? (
+                <>
+                  <input type="hidden" {...register('year', { valueAsNumber: true })} />
+                  <select
+                    id="register-year"
+                    disabled
+                    value={selectedYear ?? ''}
+                    className="auth-input"
+                    aria-readonly="true"
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((y) => (
+                      <option key={y} value={y}>
+                        {t('registerYearOption', { n: y })}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              ) : (
+                <select
+                  {...register('year', { valueAsNumber: true })}
+                  id="register-year"
+                  defaultValue=""
+                  className="auth-input"
+                >
+                  <option value="" disabled>
+                    {t('registerSelect')}
                   </option>
-                ))}
-              </select>
+                  {[1, 2, 3, 4, 5, 6].map((y) => (
+                    <option key={y} value={y}>
+                      {t('registerYearOption', { n: y })}
+                    </option>
+                  ))}
+                </select>
+              )}
               {errors.year && <p className="mt-1 text-xs text-red-700">{errors.year.message}</p>}
             </div>
           </div>

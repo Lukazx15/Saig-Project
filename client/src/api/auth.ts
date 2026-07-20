@@ -39,12 +39,16 @@ export function loginWithKmitl() {
   window.location.href = `${API_BASE_URL}/api/auth/kmitl`
 }
 
-/** Reads studentId/email out of an SSO register ticket (display only — the server re-verifies). */
-export function decodeSsoTicket(ticket: string): { studentId: string; email: string } | null {
+/** Reads studentId/email/year out of an SSO register ticket (display only — the server re-verifies). */
+export function decodeSsoTicket(
+  ticket: string,
+): { studentId: string; email: string; year: number | null } | null {
   try {
     const payload = JSON.parse(atob(ticket.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
     if (typeof payload.studentId === 'string' && typeof payload.email === 'string') {
-      return { studentId: payload.studentId, email: payload.email }
+      const year =
+        typeof payload.year === 'number' && Number.isInteger(payload.year) ? payload.year : null
+      return { studentId: payload.studentId, email: payload.email, year }
     }
     return null
   } catch {

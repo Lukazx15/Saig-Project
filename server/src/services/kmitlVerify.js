@@ -28,6 +28,23 @@ function entryYearDigitsPlausible(studentId, yearOfStudy) {
 }
 
 /**
+ * Estimate year of study (1–8) from the student ID entry-year prefix.
+ * OIDC userinfo does not include year; the first two digits of a KMITL
+ * student ID are the conventional B.E. entry year (e.g. "65" → 2565).
+ * Returns null when the id is not 8 digits.
+ */
+function inferYearOfStudyFromStudentId(studentId) {
+  if (!STUDENT_ID_REGEX.test(String(studentId || ''))) return null;
+  const prefix = parseInt(String(studentId).slice(0, 2), 10);
+  const currentBEYear = new Date().getFullYear() + 543;
+  let entryBE = Math.floor(currentBEYear / 100) * 100 + prefix;
+  if (entryBE > currentBEYear) entryBE -= 100;
+  const yearOfStudy = currentBEYear - entryBE + 1;
+  if (yearOfStudy < 1 || yearOfStudy > 8) return null;
+  return yearOfStudy;
+}
+
+/**
  * Strict format-only fallback verification. Used whenever no
  * KMITL_API_KEY is configured (the default — real KMITL developer keys
  * require manual admin approval on developer.kmitl.ac.th).
@@ -104,4 +121,9 @@ async function verifyStudent({ studentId, email, year }) {
   return verifyByFormat({ studentId, email, year });
 }
 
-module.exports = { verifyStudent, verifyByFormat, emailMatchesStudentId };
+module.exports = {
+  verifyStudent,
+  verifyByFormat,
+  emailMatchesStudentId,
+  inferYearOfStudyFromStudentId,
+};

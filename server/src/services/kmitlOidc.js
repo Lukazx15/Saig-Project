@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const env = require('../config/env');
+const { inferYearOfStudyFromStudentId } = require('./kmitlVerify');
 
 /**
  * KMITL SSO via OpenID Connect (Keycloak realm "kmitl").
@@ -121,35 +122,42 @@ async function fetchUserInfo(accessToken) {
 /**
  * Extracts the KMITL identity from OIDC userinfo claims. Student emails are
  * `<8-digit-studentId>@kmitl.ac.th`, so the studentId can be derived from
- * the email/username claim.
+ * the email/username claim. Year of study is not in userinfo — it is
+ * estimated from the student ID entry-year prefix.
  */
 function extractIdentity(userInfo) {
   const email = String(userInfo.email || userInfo.preferred_username || '').toLowerCase().trim();
   const name = String(userInfo.name || '').trim();
   const match = email.match(/^(\d{8})@kmitl\.ac\.th$/);
+  const studentId = match ? match[1] : null;
   return {
     email,
     name,
-    studentId: match ? match[1] : null,
+    studentId,
+    year: studentId ? inferYearOfStudyFromStudentId(studentId) : null,
   };
 }
 
 /**
  * Short-lived signed ticket handed to the register page when an
  * SSO-verified student does not have a local account yet. Registration
- * presents it back so the server can trust studentId/email without a
+ * presents it back so the server can trust studentId/email/year without a
  * format re-check.
  */
-function createSsoTicket({ studentId, email }) {
-  return jwt.sign({ studentId, email, purpose: 'kmitl-sso-register' }, env.jwt.accessSecret, {
-    expiresIn: '15m',
-  });
+function createSsoTicket({ studentId, email, year }) {
+  return jwt.sign(
+    { studentId, email, year: year ?? null, purpose: 'kmitl-sso-register' },
+    env.jwt.accessSecret,
+    { expiresIn: '15m' }
+  );
 }
 
 function verifySsoTicket(ticket) {
   const payload = jwt.verify(ticket, env.jwt.accessSecret);
   if (payload.purpose !== 'kmitl-sso-register') throw new Error('Invalid ticket purpose');
-  return { studentId: payload.studentId, email: payload.email };
+  const year =
+    typeof payload.year === 'number' && Number.isInteger(payload.year) ? payload.year : null;
+  return { studentId: payload.studentId, email: payload.email, year };
 }
 
 module.exports = {
