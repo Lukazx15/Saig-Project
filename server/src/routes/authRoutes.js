@@ -7,6 +7,7 @@ const {
   loginValidator,
   forgotPasswordValidator,
   resetPasswordValidator,
+  completeProfileValidator,
 } = require('../validators/authValidators');
 
 const router = express.Router();
@@ -120,7 +121,7 @@ router.get('/kmitl', authController.kmitlSsoStart);
  *         schema: { type: string }
  *     responses:
  *       302:
- *         description: Redirect to the client (logged in, register with ticket, or error)
+ *         description: Redirect to the client (complete-profile after SSO, register with ticket, or error)
  */
 router.get('/kmitl/callback', authController.kmitlSsoCallback);
 
@@ -138,6 +139,40 @@ router.get('/kmitl/callback', authController.kmitlSsoCallback);
  *         description: Not authenticated
  */
 router.get('/me', authenticate, authController.me);
+
+/**
+ * @openapi
+ * /api/auth/profile:
+ *   patch:
+ *     summary: Set or confirm faculty, major, and year (required after SSO)
+ *     tags: [Auth]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [faculty, major, year]
+ *             properties:
+ *               faculty: { type: string, example: "คณะวิศวกรรมศาสตร์" }
+ *               major: { type: string, example: "วิศวกรรมคอมพิวเตอร์" }
+ *               year: { type: integer, example: 2 }
+ *     responses:
+ *       200:
+ *         description: Profile updated
+ *       400:
+ *         description: Invalid faculty or major
+ *       401:
+ *         description: Not authenticated
+ */
+router.patch(
+  '/profile',
+  authenticate,
+  completeProfileValidator,
+  validate,
+  authController.completeProfile
+);
 
 /**
  * @openapi

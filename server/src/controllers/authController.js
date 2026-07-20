@@ -91,6 +91,7 @@ const register = asyncHandler(async (req, res) => {
     alias: generateAlias(),
     kmitlVerified: true,
     verificationMethod: verification.method,
+    pendingMajorSelection: false,
   });
 
   const accessToken = await issueSession(res, user);
@@ -209,6 +210,40 @@ const me = asyncHandler(async (req, res) => {
 });
 
 /**
+ * PATCH /api/auth/profile
+ * Explicit faculty/major/year selection — required after SSO for accuracy
+ * because KMITL identity claims do not include a trustworthy major.
+ */
+const completeProfile = asyncHandler(async (req, res) => {
+  const { faculty, major, year } = req.body;
+
+  const user = await User.findById(req.user.id);
+  if (!user) throw ApiError.notFound('User not found');
+
+  let canonical;
+  try {
+    canonical = normalizeFacultyMajor(faculty, major);
+  } catch (err) {
+    throw ApiError.badRequest('Invalid faculty or major', {
+      reason: err.message,
+      faculty,
+      major,
+    });
+  }
+
+  user.faculty = canonical.faculty;
+  user.major = canonical.major;
+  user.year = year;
+  user.pendingMajorSelection = false;
+  await user.save();
+
+  res.json({
+    success: true,
+    data: { user: user.toPublicProfile() },
+  });
+});
+
+/**
  * GET /api/auth/kmitl
  * Starts the KMITL SSO (OIDC) flow by redirecting to the KMITL login page.
  */
@@ -269,8 +304,8 @@ const kmitlSsoCallback = asyncHandler(async (req, res) => {
       user.verificationMethod = 'sso';
     }
 
-    // Re-map legacy English / broad-major labels onto the Thai catalog so
-    // returning SSO users stop splitting stats by language.
+    // Re-map legacy English / broad-major labels onto the Thai catalog for
+    // prefill — never skip the explicit confirm step below.
     const remapped = normalizeFacultyMajor(user.faculty, user.major, { soft: true });
     if (remapped.ok && (remapped.faculty !== user.faculty || remapped.major !== user.major)) {
       user.faculty = remapped.faculty;
@@ -282,8 +317,17 @@ const kmitlSsoCallback = asyncHandler(async (req, res) => {
       );
     }
 
+    // SSO does not attest faculty/major — require the student to select them.
+    if (user.role !== 'admin') {
+      user.pendingMajorSelection = true;
+    }
+
     await issueSession(res, user);
-    return res.redirect(`${clientUrl}/?sso=success`);
+
+    if (user.role === 'admin') {
+      return res.redirect(`${clientUrl}/?sso=success`);
+    }
+    return res.redirect(`${clientUrl}/complete-profile?sso=1`);
   }
 
   // New student: send them to finish registration with a verified-identity ticket.
@@ -351,6 +395,7 @@ module.exports = {
   refresh,
   logout,
   me,
+  completeProfile,
   kmitlSsoStart,
   kmitlSsoCallback,
   forgotPassword,

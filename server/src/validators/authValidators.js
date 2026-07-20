@@ -57,9 +57,18 @@ const resetPasswordValidator = [
     .withMessage('password must be at least 8 characters long'),
 ];
 
+const completeProfileValidator = [
+  body('faculty').trim().notEmpty().withMessage('faculty is required'),
+  body('major').trim().notEmpty().withMessage('major is required'),
+  body('year')
+    .isInt({ min: 1, max: 8 })
+    .withMessage('year must be an integer between 1 and 8'),
+];
+
 module.exports = {
   registerValidator,
   loginValidator,
   forgotPasswordValidator,
   resetPasswordValidator,
+  completeProfileValidator,
 };
