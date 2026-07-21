@@ -2,7 +2,7 @@ import type { Messages } from './types'
 
 /** English UI copy — written for EN locale, not mirrored from Thai. */
 export const en: Messages = {
-  brandName: '๊Ultra SAMOOD',
+  brandName: 'Ultra SAMOOD',
   brandTagline: 'Pin how your major feels today.',
 
   navBoard: 'Board',

@@ -5,7 +5,7 @@ import type { Messages } from './types'
  * Not an English→Thai translation of `en.ts`.
  */
 export const th: Messages = {
-  brandName: '๊Ultra SAMOOD',
+  brandName: 'Ultra SAMOOD',
   brandTagline: 'วันนี้สาขาคุณมู้ดยังไง มาปักไว้เลย',
 
   navBoard: 'กระดาน',
