@@ -15,10 +15,9 @@ import { NotFoundPage } from '@/pages/NotFoundPage'
 
 /**
  * Routing model:
- * - Unauthenticated `/` → redirect to `/login` (via ProtectedRoute)
- * - Authenticated `/` → board
- * - Authenticated `/login` | `/register` → redirect to board (via GuestRoute)
- * - After login/register/SSO → navigate to `/` (board)
+ * - Board is public (browse + filters); pin/compose requires login
+ * - Stats + admin require a verified session (admin for moderation)
+ * - Login / register / password reset are guest-only
  */
 function App() {
   return (
@@ -26,14 +25,7 @@ function App() {
       <AuthProvider>
         <MoodProvider>
           <Routes>
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <BoardPage />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/" element={<BoardPage />} />
             <Route
               path="/login"
               element={

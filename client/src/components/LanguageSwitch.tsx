@@ -13,8 +13,8 @@ export function LanguageSwitch({ variant = 'nav' }: LanguageSwitchProps) {
     <div
       className={
         variant === 'auth'
-          ? 'inline-flex items-center rounded-full border border-white/15 bg-night-950/50 p-0.5 shadow-sm'
-          : 'inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] p-0.5'
+          ? 'inline-flex items-center rounded-sm border border-white/15 bg-night-950/80 p-0.5'
+          : 'inline-flex items-center rounded-sm border border-white/10 bg-night-900 p-0.5'
       }
       role="group"
       aria-label={t('langSwitch')}
@@ -28,9 +28,9 @@ export function LanguageSwitch({ variant = 'nav' }: LanguageSwitchProps) {
             onClick={() => setLocale(code)}
             aria-pressed={isActive}
             className={[
-              'min-w-[2rem] rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide transition-all duration-200',
+              'min-w-[1.75rem] rounded-sm px-2 py-1 text-[11px] font-semibold tracking-wide transition-colors duration-150 sm:min-w-[2rem] sm:px-2.5',
               isActive
-                ? 'bg-brass-500 text-ink shadow-sm'
+                ? 'bg-brass-500 text-ink'
                 : 'text-paper/45 hover:text-paper/80',
             ].join(' ')}
           >

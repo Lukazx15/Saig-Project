@@ -99,13 +99,17 @@ export function ComposeModal({
                         key={type}
                         type="button"
                         onClick={() => setValue('moodType', type)}
-                        className={`flex items-center gap-1 rounded-sm border px-2.5 py-1 text-sm font-medium transition ${
+                        className={`flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-sm font-medium transition ${
                           active
                             ? 'border-ink bg-ink text-paper'
                             : 'border-ink/20 bg-white/40 text-ink-soft hover:bg-white/70'
                         }`}
                       >
-                        <span>{m.emoji}</span>
+                        <span
+                          className="h-2 w-2 rounded-sm"
+                          style={{ backgroundColor: m.color }}
+                          aria-hidden="true"
+                        />
                         <span>{t(MOOD_LABEL_KEYS[type])}</span>
                       </button>
                     )

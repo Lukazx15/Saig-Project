@@ -105,13 +105,7 @@ export function LoginPage() {
             {isSubmitting ? t('loginSubmitting') : t('loginSubmit')}
           </button>
 
-          <div className="flex items-center gap-3" aria-hidden="true">
-            <span className="h-px flex-1 bg-ink/10" />
-            <span className="text-xs uppercase tracking-wide text-ink-soft">{t('loginOr')}</span>
-            <span className="h-px flex-1 bg-ink/10" />
-          </div>
-
-          <button type="button" onClick={loginWithKmitl} className="auth-btn-secondary">
+          <button type="button" onClick={loginWithKmitl} className="auth-btn-quiet">
             {t('loginKmitl')}
           </button>
         </form>

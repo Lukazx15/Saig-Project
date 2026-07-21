@@ -34,8 +34,9 @@ const router = express.Router();
  *       400: { description: Validation error }
  *       401: { description: Not authenticated }
  *   get:
- *     summary: List mood notes with filters + pagination
+ *     summary: List mood notes with filters + pagination (public; auth personalizes ownership flags)
  *     tags: [Moods]
+ *     security: []
  *     parameters:
  *       - in: query
  *         name: moodType
@@ -68,8 +69,9 @@ router.get('/', optionalAuthenticate, listMoodsValidator, validate, moodControll
  * @openapi
  * /api/moods/{id}:
  *   get:
- *     summary: Get a single mood note
+ *     summary: Get a single mood note (public; auth personalizes ownership flags)
  *     tags: [Moods]
+ *     security: []
  *     parameters:
  *       - in: path
  *         name: id

@@ -1,9 +1,8 @@
 const { verifyAccessToken } = require('../services/tokenService');
 
-// Populates req.user = { id, role } when a valid Bearer token is present,
-// but never rejects the request — used on public routes (e.g. the mood
-// feed) that still need to know "is this viewer the author?" for the
-// isOwner/canEdit/canDelete flags without requiring authentication.
+// Populates req.user when a valid Bearer token is present, but never
+// rejects the request. Kept for any route that personalizes a response
+// without requiring a session.
 async function optionalAuthenticate(req, _res, next) {
   const header = req.headers.authorization || '';
   const [scheme, token] = header.split(' ');

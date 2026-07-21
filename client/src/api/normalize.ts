@@ -246,18 +246,9 @@ export function normalizeStats(raw: unknown): MoodStats {
       }))
     : undefined
 
-  // `dominantMood` may be a bare mood-type string, or an object like
-  // `{ moodType, color, count }`.
-  const dominantObj = asRecord(src.dominantMood)
-  const dominantRaw = pickString(
-    dominantObj.moodType,
-    typeof src.dominantMood === 'string' ? src.dominantMood : undefined,
-    src.dominant,
-    src.campusVibe,
-  )
-  const dominantMood = isMoodType(dominantRaw)
-    ? dominantRaw
-    : dominantFromDistribution(distribution)
+  // Always derive dominant from counts so ties are stable (first in MOOD_TYPES
+  // wins). Ignoring the server's pick avoids Mongo aggregation order flicker.
+  const dominantMood = dominantFromDistribution(distribution)
 
   const totalMoods =
     pickNumber(src.totalMoods, src.total, src.count) ??

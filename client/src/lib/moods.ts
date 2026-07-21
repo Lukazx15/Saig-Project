@@ -274,7 +274,37 @@ export function rotationForId(id: string): number {
   for (let i = 0; i < id.length; i += 1) {
     hash = (hash * 31 + id.charCodeAt(i)) | 0
   }
-  return ((hash % 11) - 5) * 0.9
+  return ((hash % 11) - 5) * 1.15
+}
+
+/** Stable vertical nudge so the board feels pinned, not a uniform card grid. */
+export function pinOffsetForId(id: string): number {
+  let hash = 0
+  for (let i = 0; i < id.length; i += 1) {
+    hash = (hash * 33 + id.charCodeAt(i)) | 0
+  }
+  return (Math.abs(hash) % 9) * 6 - 18
+}
+
+/** Horizontal drift — slight overlap / stagger between neighbors. */
+export function pinOffsetXForId(id: string): number {
+  let hash = 0
+  for (let i = 0; i < id.length; i += 1) {
+    hash = (hash * 29 + id.charCodeAt(i)) | 0
+  }
+  return ((Math.abs(hash) % 9) - 4) * 5
+}
+
+/** Short / medium / tall note heights for irregular corkboard rhythm. */
+export function pinSizeForId(id: string): 'short' | 'medium' | 'tall' {
+  let hash = 0
+  for (let i = 0; i < id.length; i += 1) {
+    hash = (hash * 37 + id.charCodeAt(i)) | 0
+  }
+  const n = Math.abs(hash) % 3
+  if (n === 0) return 'short'
+  if (n === 1) return 'medium'
+  return 'tall'
 }
 
 export function dominantFromDistribution(

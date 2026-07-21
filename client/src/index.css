@@ -47,7 +47,7 @@
 
   html[data-locale='th'] {
     --font-body: 'Prompt', 'Nunito', 'Segoe UI', sans-serif;
-    --font-hand: 'Prompt', 'Caveat', cursive;
+    --font-hand: 'Mali', 'Prompt', cursive;
   }
 
   body {
@@ -84,19 +84,8 @@
 }
 
 .wood-frame {
-  border-width: 14px;
-  border-style: solid;
-  border-image: linear-gradient(
-      135deg,
-      var(--color-cork-900),
-      var(--color-cork-700) 40%,
-      var(--color-cork-900) 60%,
-      var(--color-cork-800)
-    )
-    1;
-  box-shadow:
-    0 20px 60px -20px rgba(0, 0, 0, 0.55),
-    inset 0 0 0 2px rgba(0, 0, 0, 0.25);
+  border: 2px solid var(--color-cork-900);
+  box-shadow: inset 0 0 0 1px rgba(251, 246, 236, 0.08);
 }
 
 .pin-shadow {
@@ -122,134 +111,41 @@
   border-radius: 999px;
 }
 
-/* Auth scene — dusk room with soft cork glow + drifting mood scraps */
+/* Auth scene — dusk room; cork fills the board plane (not a scrap behind the card) */
 .auth-scene {
   background:
-    radial-gradient(ellipse 80% 55% at 50% -10%, rgba(168, 113, 63, 0.28), transparent 55%),
-    radial-gradient(ellipse 45% 40% at 85% 80%, rgba(217, 165, 68, 0.12), transparent 50%),
-    radial-gradient(ellipse 40% 35% at 10% 70%, rgba(74, 49, 32, 0.45), transparent 55%),
-    linear-gradient(165deg, var(--color-night-950) 0%, var(--color-night-900) 48%, #0c1516 100%);
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(35, 61, 63, 0.45) 0%, transparent 70%),
+    var(--color-night-950);
 }
 
-.auth-ambient {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-
-.auth-glow {
-  position: absolute;
-  left: 50%;
-  top: 42%;
-  width: min(36rem, 90vw);
-  height: 22rem;
-  translate: -50% -40%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(168, 113, 63, 0.18), transparent 68%);
-  animation: auth-pulse 10s ease-in-out infinite;
-}
-
-.auth-cork-panel {
+.auth-cork-field {
   background-color: var(--color-cork-600);
   background-image:
-    radial-gradient(circle at 12% 28%, rgba(74, 49, 32, 0.38) 0, transparent 2.2%),
-    radial-gradient(circle at 38% 62%, rgba(74, 49, 32, 0.32) 0, transparent 2%),
-    radial-gradient(circle at 72% 22%, rgba(74, 49, 32, 0.3) 0, transparent 1.8%),
-    radial-gradient(circle at 88% 74%, rgba(216, 166, 108, 0.28) 0, transparent 2.4%),
-    linear-gradient(155deg, var(--color-cork-500) 0%, var(--color-cork-700) 100%);
-  opacity: 0.55;
-  box-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.65);
-}
-
-.auth-drift {
-  position: absolute;
-  display: block;
-  width: 4.5rem;
-  height: 4.5rem;
-  border-radius: 2px;
-  opacity: 0.22;
-  box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.45);
-  animation: auth-float 14s ease-in-out infinite;
-}
-
-.auth-drift-a {
-  top: 14%;
-  left: 8%;
-  background: var(--color-mood-calm);
-  transform: rotate(-8deg);
-  animation-delay: 0s;
-}
-
-.auth-drift-b {
-  top: 22%;
-  right: 10%;
-  width: 3.6rem;
-  height: 3.6rem;
-  background: var(--color-mood-happy);
-  transform: rotate(6deg);
-  animation-delay: -4s;
-  animation-duration: 16s;
-}
-
-.auth-drift-c {
-  bottom: 16%;
-  left: 14%;
-  width: 3.2rem;
-  height: 3.2rem;
-  background: var(--color-mood-tired);
-  transform: rotate(12deg);
-  animation-delay: -7s;
-  animation-duration: 18s;
-}
-
-.auth-drift-d {
-  bottom: 22%;
-  right: 12%;
-  width: 2.8rem;
-  height: 2.8rem;
-  background: var(--color-mood-excited);
-  transform: rotate(-14deg);
-  animation-delay: -2s;
-  animation-duration: 15s;
-}
-
-@keyframes auth-float {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  50% {
-    translate: 0 -14px;
-  }
-}
-
-@keyframes auth-pulse {
-  0%,
-  100% {
-    opacity: 0.7;
-    scale: 1;
-  }
-  50% {
-    opacity: 1;
-    scale: 1.04;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .auth-drift,
-  .auth-glow {
-    animation: none;
-  }
+    radial-gradient(circle at 8% 22%, rgba(74, 49, 32, 0.35) 0, transparent 2.4%),
+    radial-gradient(circle at 24% 68%, rgba(74, 49, 32, 0.3) 0, transparent 2%),
+    radial-gradient(circle at 42% 12%, rgba(74, 49, 32, 0.28) 0, transparent 1.8%),
+    radial-gradient(circle at 63% 44%, rgba(74, 49, 32, 0.32) 0, transparent 2.2%),
+    radial-gradient(circle at 81% 78%, rgba(74, 49, 32, 0.3) 0, transparent 2%),
+    radial-gradient(circle at 91% 18%, rgba(74, 49, 32, 0.26) 0, transparent 1.6%),
+    radial-gradient(circle at 15% 88%, rgba(74, 49, 32, 0.24) 0, transparent 1.8%),
+    radial-gradient(circle at 55% 92%, rgba(74, 49, 32, 0.28) 0, transparent 2%),
+    radial-gradient(circle at 33% 40%, rgba(216, 166, 108, 0.35) 0, transparent 3%),
+    radial-gradient(circle at 72% 60%, rgba(216, 166, 108, 0.3) 0, transparent 2.6%),
+    linear-gradient(160deg, var(--color-cork-500) 0%, var(--color-cork-700) 100%);
+  background-size:
+    140px 140px, 160px 160px, 120px 120px, 150px 150px, 130px 130px,
+    145px 145px, 155px 155px, 135px 135px, 220px 220px, 200px 200px, 100% 100%;
+  box-shadow:
+    inset 0 0 0 10px var(--color-cork-900),
+    inset 0 0 0 12px rgba(251, 246, 236, 0.08),
+    inset 0 40px 80px -40px rgba(0, 0, 0, 0.35);
 }
 
 .auth-label {
   margin-bottom: 0.25rem;
   display: block;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--color-ink-soft);
 }
 
@@ -295,18 +191,83 @@
   opacity: 0.6;
 }
 
-.auth-btn-secondary {
+/* Quiet secondary — text action, not a twin primary button */
+.auth-btn-quiet {
   width: 100%;
-  border-radius: 2px;
-  border: 1.5px solid var(--color-cork-800);
-  background: #fffef9;
-  padding: 0.7rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-cork-800);
-  transition: background 0.15s ease;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition:
+    color 0.15s ease,
+    text-decoration-color 0.15s ease;
 }
 
-.auth-btn-secondary:hover {
-  background: rgba(107, 69, 39, 0.06);
+.auth-btn-quiet:hover {
+  color: var(--color-cork-800);
+  text-decoration-color: var(--color-cork-700);
 }
+
+/* Filter scrap — wood rail + pinned paper, not a dark chip dock */
+.filter-wood {
+  background:
+    linear-gradient(180deg, #5c3d24 0%, #4a3120 48%, #3d2919 100%);
+  border: 1px solid rgba(20, 12, 4, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(251, 246, 236, 0.12),
+    0 6px 14px -8px rgba(0, 0, 0, 0.45);
+}
+
+.filter-paper {
+  background: #fbf6ec;
+  border: 1px solid rgba(36, 26, 18, 0.12);
+  box-shadow: 0 2px 4px rgba(20, 12, 4, 0.12);
+  color: var(--color-ink);
+}
+
+.filter-select {
+  border-radius: 2px;
+  border: 1px solid rgba(36, 26, 18, 0.16);
+  background: #fffef9;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-ink);
+}
+
+.filter-select:focus {
+  border-color: var(--color-cork-700);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(138, 92, 52, 0.18);
+}
+
+@keyframes brand-loader-pin {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, 3px);
+  }
+}
+
+@keyframes brand-loader-paper {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.88;
+  }
+}
+
+.brand-loader-pin {
+  animation: brand-loader-pin 1.4s ease-in-out infinite;
+}
+
+.brand-loader-paper {
+  animation: brand-loader-paper 1.4s ease-in-out infinite;
+}
+

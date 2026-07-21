@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
+import { BrandLoader } from '@/components/BrandLoader'
 import { useAuth } from '@/context/AuthContext'
 import { useLocale } from '@/context/LocaleContext'
 
@@ -14,13 +15,7 @@ export function ProtectedRoute({ children, requireAdmin }: ProtectedRouteProps) 
   const location = useLocation()
 
   if (isBootstrapping) {
-    return (
-      <div className="auth-scene flex min-h-screen items-center justify-center px-4">
-        <p className="text-sm text-paper/60" style={{ fontFamily: 'var(--font-body)' }}>
-          {t('loadingSession')}
-        </p>
-      </div>
-    )
+    return <BrandLoader message={t('loadingSession')} />
   }
 
   if (!isAuthenticated) {

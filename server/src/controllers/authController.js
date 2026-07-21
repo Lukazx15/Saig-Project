@@ -119,6 +119,10 @@ const login = asyncHandler(async (req, res) => {
   const passwordOk = await bcrypt.compare(password, user.passwordHash);
   if (!passwordOk) throw ApiError.unauthorized('Invalid student ID or password');
 
+  if (!user.kmitlVerified) {
+    throw ApiError.forbidden('Only verified KMITL students can sign in');
+  }
+
   const accessToken = await issueSession(res, user);
 
   res.json({
@@ -149,6 +153,9 @@ const refresh = asyncHandler(async (req, res) => {
 
   const user = await User.findById(payload.sub).select('+refreshTokenHash +refreshTokenExpiresAt');
   if (!user || !user.refreshTokenHash) throw ApiError.unauthorized('Session not found, please log in again');
+  if (!user.kmitlVerified) {
+    throw ApiError.forbidden('Only verified KMITL students can use this app');
+  }
 
   const isExpired = !user.refreshTokenExpiresAt || user.refreshTokenExpiresAt.getTime() < Date.now();
   const isMismatch = user.refreshTokenHash !== hashToken(token);

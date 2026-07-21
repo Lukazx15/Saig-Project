@@ -24,13 +24,23 @@ const getStats = asyncHandler(async (_req, res) => {
     return acc;
   }, {});
   overall.forEach((row) => {
-    distribution[row._id].count = row.count;
+    if (distribution[row._id]) {
+      distribution[row._id].count = row.count;
+    }
   });
 
-  const dominantMood = overall.reduce(
-    (best, row) => (!best || row.count > best.count ? row : best),
-    null
-  );
+  // Stable dominant: highest count; on a tie, prefer earlier mood in MOOD_TYPES
+  // (e.g. happy before stressed) so the UI doesn't flip between refreshes.
+  let dominantMood = null;
+  for (const type of MOOD_TYPES) {
+    const entry = distribution[type];
+    if (!dominantMood || entry.count > dominantMood.count) {
+      dominantMood = { moodType: type, color: entry.color, count: entry.count };
+    }
+  }
+  if (dominantMood && dominantMood.count === 0) {
+    dominantMood = null;
+  }
 
   const groupByKey = (rows, keyName) => {
     const grouped = {};
@@ -47,9 +57,7 @@ const getStats = asyncHandler(async (_req, res) => {
     data: {
       total,
       distribution,
-      dominantMood: dominantMood
-        ? { moodType: dominantMood._id, color: MOOD_COLORS[dominantMood._id], count: dominantMood.count }
-        : null,
+      dominantMood: dominantMood,
       byFaculty: groupByKey(byFaculty, 'faculty'),
       byMajor: groupByKey(byMajor, 'major'),
     },
