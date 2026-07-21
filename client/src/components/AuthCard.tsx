@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { PinIcon } from '@/components/PinIcon'
+import { LanguageSwitch } from '@/components/LanguageSwitch'
 import { useLocale } from '@/context/LocaleContext'
 
 interface AuthCardProps {
@@ -19,9 +20,18 @@ export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-3 py-10 sm:px-6 sm:py-14">
       <div
-        className="auth-cork-field wood-frame absolute inset-3 -z-0 rounded-sm sm:inset-5 md:inset-8"
+        className="auth-cork-field wood-frame absolute inset-3 rounded-sm sm:inset-5 md:inset-8"
         aria-hidden="true"
       />
+
+      <div className="absolute right-[calc(0.75rem+12px)] top-[calc(0.75rem+12px)] z-20 sm:right-[calc(1.25rem+14px)] sm:top-[calc(1.25rem+14px)] md:right-[calc(2rem+14px)] md:top-[calc(2rem+14px)]">
+        <div className="relative">
+          <div className="pin-shadow absolute -top-2.5 left-1/2 z-10 -translate-x-1/2">
+            <PinIcon className="h-4 w-4" />
+          </div>
+          <LanguageSwitch variant="board" />
+        </div>
+      </div>
 
       <div className="relative z-10 flex w-full max-w-md flex-col items-center">
         <motion.div
