@@ -3,46 +3,39 @@ import { MOOD_TYPES } from '@/types'
 
 export const MOOD_META: Record<
   MoodType,
-  { label: string; emoji: string; color: string; tint: string }
+  { emoji: string; color: string; tint: string }
 > = {
   happy: {
-    label: 'Happy',
     emoji: '😊',
     color: '#FFE066',
     tint: 'rgba(255, 224, 102, 0.35)',
   },
   calm: {
-    label: 'Calm',
     emoji: '🌿',
     color: '#A8DADC',
     tint: 'rgba(168, 218, 220, 0.38)',
   },
   tired: {
-    label: 'Tired',
     emoji: '😴',
     color: '#CDB4DB',
     tint: 'rgba(205, 180, 219, 0.4)',
   },
   stressed: {
-    label: 'Stressed',
     emoji: '😰',
     color: '#F4A261',
     tint: 'rgba(244, 162, 97, 0.35)',
   },
   sad: {
-    label: 'Sad',
     emoji: '😔',
     color: '#90CAF9',
     tint: 'rgba(144, 202, 249, 0.38)',
   },
   excited: {
-    label: 'Excited',
     emoji: '✨',
     color: '#FF9F1C',
     tint: 'rgba(255, 159, 28, 0.35)',
   },
   angry: {
-    label: 'Angry',
     emoji: '😤',
     color: '#E63946',
     tint: 'rgba(230, 57, 70, 0.35)',
@@ -243,12 +236,12 @@ export const KMITL_MAJORS_BY_FACULTY = {
   คณะพยาบาลศาสตร์: ['พยาบาลศาสตรบัณฑิต'],
 } as const satisfies Record<string, readonly string[]>
 
-export type KmitlFaculty = keyof typeof KMITL_MAJORS_BY_FACULTY
+type KmitlFaculty = keyof typeof KMITL_MAJORS_BY_FACULTY
 
 export const KMITL_FACULTIES = Object.keys(KMITL_MAJORS_BY_FACULTY) as KmitlFaculty[]
 
 /** Flat unique major list across all faculties (stable order). */
-export const KMITL_ALL_MAJORS: readonly string[] = Array.from(
+const KMITL_ALL_MAJORS: readonly string[] = Array.from(
   new Set(KMITL_FACULTIES.flatMap((faculty) => [...KMITL_MAJORS_BY_FACULTY[faculty]])),
 )
 

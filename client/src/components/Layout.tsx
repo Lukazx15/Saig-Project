@@ -4,11 +4,10 @@ import { Navbar } from '@/components/Navbar'
 interface LayoutProps {
   children: ReactNode
   /**
-   * 'board' — corkboard page content (navbar + open main).
-   * 'plain' — solid dusk pages (stats/admin).
+   * 'plain' — solid dusk pages with navbar (board/stats/admin).
    * 'auth' — full-bleed login/register (no app chrome).
    */
-  variant?: 'board' | 'plain' | 'auth'
+  variant?: 'plain' | 'auth'
 }
 
 export function Layout({ children, variant = 'plain' }: LayoutProps) {

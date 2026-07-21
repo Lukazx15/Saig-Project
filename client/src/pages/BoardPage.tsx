@@ -50,7 +50,7 @@ export function BoardPage() {
   }
 
   return (
-    <Layout variant="board">
+    <Layout>
       <div className="cork-texture min-h-[calc(100vh-64px)] pb-24 sm:pb-16">
         <div className="mx-auto max-w-6xl px-3 pt-6 sm:px-6 sm:pt-10">
           <motion.div

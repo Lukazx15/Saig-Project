@@ -2,8 +2,7 @@ import type { Messages } from './types'
 
 /** English UI copy — written for EN locale, not mirrored from Thai. */
 export const en: Messages = {
-  brandName: 'Mood of the Major',
-  brandTag: 'Campus corkboard',
+  brandName: '๊Ultra SAMOOD',
   brandTagline: 'Pin how your major feels today.',
 
   navBoard: 'Board',
@@ -27,7 +26,6 @@ export const en: Messages = {
   loginPassword: 'Password',
   loginSubmit: 'Sign in',
   loginSubmitting: 'Signing in…',
-  loginOr: 'or',
   loginKmitl: 'Sign in with KMITL',
   loginFailed: 'Login failed',
   loginSsoFailed: 'KMITL sign-in failed',
@@ -68,7 +66,6 @@ export const en: Messages = {
   registerFailed: 'Registration failed',
   registerAlready: 'Already a member?',
   registerSignIn: 'Sign in',
-  registerMajorPlaceholder: 'Computer Engineering',
   registerSelectMajor: 'Select major…',
   registerSelectFacultyFirst: 'Select faculty first…',
 
@@ -86,7 +83,6 @@ export const en: Messages = {
   filterAllMoods: 'All moods',
   filterAnyFaculty: 'Any faculty',
   filterAnyMajor: 'Any major',
-  filterMajorPlaceholder: 'Major (e.g. Computer Eng.)',
   filterFaculty: 'Faculty',
   filterMajor: 'Major',
   filterDateFrom: 'From date',
@@ -117,10 +113,8 @@ export const en: Messages = {
   statsSubtitle: 'Live mood distribution across the whole board.',
   statsLoading: 'Reading the room…',
   statsFailed: 'Failed to load stats',
-  statsDominant: 'Dominant campus mood',
   statsDominantShort: 'Top mood',
   statsNoMoods: 'No moods yet',
-  statsTotalPinned: 'Total pinned',
   statsByFaculty: 'By faculty',
   statsDonutLabel: 'Mood distribution donut chart',
   statsDonutTotal: 'pinned',
@@ -133,11 +127,6 @@ export const en: Messages = {
   adminSearch: 'Search notes',
   adminSearchPlaceholder: 'Search message, alias, faculty…',
   adminSearchEmpty: 'No notes match this search.',
-  adminColMood: 'Mood',
-  adminColMessage: 'Message',
-  adminColAlias: 'Alias',
-  adminColFaculty: 'Faculty / Major',
-  adminColPinned: 'Pinned',
   adminDelete: 'Delete',
   adminDeleting: 'Removing…',
   adminDeleteConfirm: 'Delete this note by "{alias}"?',

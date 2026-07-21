@@ -12,7 +12,7 @@ import { useAuth } from '@/context/AuthContext'
 import type { ComposeMoodFormValues } from '@/lib/schemas'
 import type { MoodFilters, MoodNote, PaginationMeta } from '@/types'
 
-export const DEFAULT_FILTERS: MoodFilters = {
+const DEFAULT_FILTERS: MoodFilters = {
   moodType: '',
   faculty: '',
   major: '',
@@ -35,7 +35,6 @@ interface MoodContextValue {
   composeMood: (values: ComposeMoodFormValues) => Promise<MoodNote>
   editMood: (id: string, values: ComposeMoodFormValues) => Promise<MoodNote>
   removeMood: (id: string) => Promise<void>
-  ownsNote: (note: MoodNote) => boolean
 }
 
 const MoodContext = createContext<MoodContextValue | null>(null)
@@ -52,11 +51,6 @@ export function MoodProvider({ children }: { children: ReactNode }) {
   const [filters, setFiltersState] = useState<MoodFilters>(DEFAULT_FILTERS)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  const ownsNote = useCallback(
-    (note: MoodNote) => Boolean(note.isOwner),
-    [],
-  )
 
   const refresh = useCallback(async () => {
     setIsLoading(true)
@@ -176,7 +170,6 @@ export function MoodProvider({ children }: { children: ReactNode }) {
       composeMood,
       editMood,
       removeMood,
-      ownsNote,
     }),
     [
       moods,
@@ -191,7 +184,6 @@ export function MoodProvider({ children }: { children: ReactNode }) {
       composeMood,
       editMood,
       removeMood,
-      ownsNote,
     ],
   )
 

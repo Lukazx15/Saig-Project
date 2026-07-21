@@ -8,9 +8,6 @@
   /* Deep dusk backdrop the corkboard hangs against */
   --color-night-950: #101a1c;
   --color-night-900: #142325;
-  --color-night-800: #1b2f31;
-  --color-night-700: #233d3f;
-  --color-night-600: #2f4f50;
 
   /* Cork board wood + surface tones */
   --color-cork-900: #4a3120;
@@ -18,8 +15,6 @@
   --color-cork-700: #8a5c34;
   --color-cork-600: #a8713f;
   --color-cork-500: #c08c53;
-  --color-cork-400: #d3a56f;
-  --color-cork-300: #e4bf8e;
 
   --color-paper: #fbf6ec;
   --color-ink: #241a12;
@@ -27,17 +22,7 @@
 
   /* Brand accent — warm brass, not purple */
   --color-brass-500: #d9a544;
-  --color-brass-600: #c48a2e;
   --color-brass-400: #e6bd6e;
-
-  /* Mood palette (fallback preview — server owns the source of truth per note) */
-  --color-mood-happy: #ffe066;
-  --color-mood-calm: #a8dadc;
-  --color-mood-tired: #cdb4db;
-  --color-mood-stressed: #f4a261;
-  --color-mood-sad: #90caf9;
-  --color-mood-excited: #ff9f1c;
-  --color-mood-angry: #e63946;
 }
 
 @layer base {
@@ -101,14 +86,6 @@
 ::selection {
   background: var(--color-brass-500);
   color: var(--color-ink);
-}
-
-.scrollbar-thin::-webkit-scrollbar {
-  width: 8px;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.25);
-  border-radius: 999px;
 }
 
 /* Auth scene — dusk room; cork fills the board plane (not a scrap behind the card) */

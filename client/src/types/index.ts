@@ -86,9 +86,3 @@ export interface AuthResponse {
   accessToken: string
   user: User
 }
-
-export interface ApiErrorBody {
-  message?: string
-  error?: string
-  errors?: Array<{ msg?: string; message?: string; path?: string }>
-}

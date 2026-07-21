@@ -13,10 +13,6 @@ export function setAccessToken(token: string | null) {
   accessToken = token
 }
 
-export function getAccessToken() {
-  return accessToken
-}
-
 /** Registered by AuthContext so the interceptor can force a logout when refresh fails. */
 export function registerUnauthorizedHandler(handler: (() => void) | null) {
   onUnauthorized = handler
@@ -88,5 +84,3 @@ api.interceptors.response.use(
     return Promise.reject(error)
   },
 )
-
-export { performRefresh }

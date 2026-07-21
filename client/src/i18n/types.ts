@@ -3,7 +3,6 @@ export type Locale = 'en' | 'th'
 
 export type MessageKey =
   | 'brandName'
-  | 'brandTag'
   | 'brandTagline'
   | 'navBoard'
   | 'navCampusVibe'
@@ -24,7 +23,6 @@ export type MessageKey =
   | 'loginPassword'
   | 'loginSubmit'
   | 'loginSubmitting'
-  | 'loginOr'
   | 'loginKmitl'
   | 'loginFailed'
   | 'loginSsoFailed'
@@ -64,7 +62,6 @@ export type MessageKey =
   | 'registerFailed'
   | 'registerAlready'
   | 'registerSignIn'
-  | 'registerMajorPlaceholder'
   | 'boardTitle'
   | 'boardSubtitle'
   | 'boardLoading'
@@ -78,7 +75,6 @@ export type MessageKey =
   | 'filterAllMoods'
   | 'filterAnyFaculty'
   | 'filterAnyMajor'
-  | 'filterMajorPlaceholder'
   | 'filterFaculty'
   | 'filterMajor'
   | 'filterDateFrom'
@@ -107,10 +103,8 @@ export type MessageKey =
   | 'statsSubtitle'
   | 'statsLoading'
   | 'statsFailed'
-  | 'statsDominant'
   | 'statsDominantShort'
   | 'statsNoMoods'
-  | 'statsTotalPinned'
   | 'statsByFaculty'
   | 'statsDonutLabel'
   | 'statsDonutTotal'
@@ -122,11 +116,6 @@ export type MessageKey =
   | 'adminSearch'
   | 'adminSearchPlaceholder'
   | 'adminSearchEmpty'
-  | 'adminColMood'
-  | 'adminColMessage'
-  | 'adminColAlias'
-  | 'adminColFaculty'
-  | 'adminColPinned'
   | 'adminDelete'
   | 'adminDeleting'
   | 'adminDeleteConfirm'
@@ -138,6 +127,3 @@ export type MessageKey =
   | 'postItDelete'
 
 export type Messages = Record<MessageKey, string>
-
-/** @deprecated use MessageKey */
-export type TranslationKey = MessageKey

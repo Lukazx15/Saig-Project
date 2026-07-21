@@ -5,9 +5,8 @@ import type { Messages } from './types'
  * Not an English→Thai translation of `en.ts`.
  */
 export const th: Messages = {
-  brandName: 'Mood of the Major',
-  brandTag: 'กระดานอารมณ์ในรั้ว',
-  brandTagline: 'วันนี้สาขาคุณมูฟยังไง มาปักไว้เลย',
+  brandName: '๊Ultra SAMOOD',
+  brandTagline: 'วันนี้สาขาคุณมู้ดยังไง มาปักไว้เลย',
 
   navBoard: 'กระดาน',
   navCampusVibe: 'มู้ดโดยรวม',
@@ -30,7 +29,6 @@ export const th: Messages = {
   loginPassword: 'รหัสผ่าน',
   loginSubmit: 'เข้าสู่ระบบ',
   loginSubmitting: 'กำลังเข้าสู่ระบบ…',
-  loginOr: 'หรือ',
   loginKmitl: 'ใช้บัญชี KMITL',
   loginFailed: 'เข้าสู่ระบบไม่สำเร็จ',
   loginSsoFailed: 'เข้าด้วย KMITL ไม่สำเร็จ',
@@ -71,7 +69,6 @@ export const th: Messages = {
   registerFailed: 'สมัครไม่สำเร็จ',
   registerAlready: 'มีบัญชีอยู่แล้ว',
   registerSignIn: 'เข้าสู่ระบบ',
-  registerMajorPlaceholder: 'วิศวกรรมคอมพิวเตอร์',
   registerSelectMajor: 'เลือกสาขา…',
   registerSelectFacultyFirst: 'เลือกคณะก่อน…',
 
@@ -89,7 +86,6 @@ export const th: Messages = {
   filterAllMoods: 'ทุกมู้ด',
   filterAnyFaculty: 'ทุกคณะ',
   filterAnyMajor: 'ทุกสาขา',
-  filterMajorPlaceholder: 'สาขา เช่น วิศวกรรมคอมพิวเตอร์',
   filterFaculty: 'คณะ',
   filterMajor: 'สาขา',
   filterDateFrom: 'ตั้งแต่วันที่',
@@ -120,10 +116,8 @@ export const th: Messages = {
   statsSubtitle: 'ภาพรวมอารมณ์ของคณะแบบสดๆ',
   statsLoading: 'กำลังเช็กบรรยากาศ…',
   statsFailed: 'ดึงสถิติไม่สำเร็จ',
-  statsDominant: 'มู้ดหลักตอนนี้',
   statsDominantShort: 'มู้ดหลัก',
   statsNoMoods: 'ยังไม่มีมู้ดของคณะนี้',
-  statsTotalPinned: 'ปักแล้วทั้งหมด',
   statsByFaculty: 'แยกตามคณะ',
   statsDonutLabel: 'กราฟโดนัทการกระจายมู้ด',
   statsDonutTotal: 'ปักแล้ว',
@@ -136,11 +130,6 @@ export const th: Messages = {
   adminSearch: 'ค้นหาโน้ต',
   adminSearchPlaceholder: 'ค้นหาข้อความ นามแฝง คณะ…',
   adminSearchEmpty: 'ไม่พบโน้ตตามคำค้นนี้',
-  adminColMood: 'มู้ด',
-  adminColMessage: 'ข้อความ',
-  adminColAlias: 'นามแฝง',
-  adminColFaculty: 'คณะ / สาขา',
-  adminColPinned: 'เวลาที่ปัก',
   adminDelete: 'ลบ',
   adminDeleting: 'กำลังลบ…',
   adminDeleteConfirm: 'ลบโน้ตของ "{alias}" เลยไหม',
