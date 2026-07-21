@@ -39,6 +39,15 @@ npm run dev:server
 npm run dev:client
 ```
 
+## Production deploy (Render + Vercel)
+
+See **[DEPLOY.md](./DEPLOY.md)** for the full checklist:
+
+1. MongoDB Atlas
+2. Render Web Service from `render.yaml` (API, root `server/`)
+3. Vercel project (client, root `client/`, env `VITE_API_URL`)
+4. Set Render `CLIENT_URL` to the Vercel origin and redeploy
+
 ## Status
 
-Phase 1 bootstrap only: empty `client/` and `server/` directories, Docker Compose for MongoDB, and this README. Application code lands in later phases.
+Feature-complete for local development. Cloud deploy config is in `render.yaml`, `client/vercel.json`, and `DEPLOY.md`.

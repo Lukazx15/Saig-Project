@@ -1,0 +1,52 @@
+# Render Blueprint — Mood of the Major API
+# Docs: https://render.com/docs/blueprint-spec
+#
+# After first deploy:
+# 1. Set secret env vars in the Render dashboard (marked sync: false).
+# 2. Set CLIENT_URL to your Vercel URL, then redeploy.
+# 3. Seed admin once: Render Shell → cd to service → npm run seed:admin
+
+services:
+  - type: web
+    name: mood-of-the-major-api
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        value: mongodb+srv://68010346_db_user:WJtrsI2Gif0CES7a@cluster0.lqnptay.mongodb.net/?appName=Cluster0
+      - key: CLIENT_URL
+        value: https://ultra-samood.vercel.app
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_ACCESS_EXPIRES_IN
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 7d
+      - key: ADMIN_STUDENT_ID
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_FACULTY
+        value: Administration
+      - key: ADMIN_MAJOR
+        value: Administration
+      - key: ADMIN_YEAR
+        value: "4"
+      - key: KMITL_OIDC_ISSUER
+        value: https://sso.kmitl.ac.th/realms/kmitl
+      - key: KMITL_OIDC_CLIENT_ID
+        sync: false
+      - key: KMITL_OIDC_CLIENT_SECRET
+        sync: false
+      - key: KMITL_OIDC_REDIRECT_URI
+        sync: false
