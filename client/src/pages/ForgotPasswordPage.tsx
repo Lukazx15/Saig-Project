@@ -24,8 +24,8 @@ export function ForgotPasswordPage() {
   async function onSubmit(values: ForgotPasswordFormValues) {
     setSubmitError(null)
     try {
-      const resetToken = await forgotPassword(values)
-      navigate(`/reset-password?token=${encodeURIComponent(resetToken)}`, { replace: true })
+      await forgotPassword(values)
+      navigate('/reset-password', { replace: true })
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : t('forgotFailed'))
     }

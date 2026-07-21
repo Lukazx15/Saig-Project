@@ -17,7 +17,13 @@ const {
   refreshExpiryDate,
   refreshCookieOptions,
   clearRefreshCookieOptions,
+  ssoTicketCookieOptions,
+  clearSsoTicketCookieOptions,
+  resetTokenCookieOptions,
+  clearResetTokenCookieOptions,
   REFRESH_COOKIE_NAME,
+  SSO_TICKET_COOKIE,
+  RESET_TOKEN_COOKIE,
 } = require('../services/tokenService');
 
 const BCRYPT_ROUNDS = 12;
@@ -38,23 +44,25 @@ async function issueSession(res, user) {
  * POST /api/auth/register
  */
 const register = asyncHandler(async (req, res) => {
-  const { studentId, email, faculty, major, year, password, ssoTicket } = req.body;
+  const { studentId, email, faculty, major, year, password } = req.body;
   const normalizedEmail = String(email).toLowerCase().trim();
+  const ssoTicket = req.cookies?.[SSO_TICKET_COOKIE];
 
   const existing = await User.findOne({ $or: [{ studentId }, { email: normalizedEmail }] });
   if (existing) {
     throw ApiError.conflict('An account with this studentId or email already exists');
   }
 
-  // An SSO ticket proves the student already authenticated with the real
-  // KMITL identity provider — trust it over the format/API check, but only
-  // if the submitted identity matches what SSO attested.
+  // An SSO ticket cookie proves the student already authenticated with the
+  // real KMITL identity provider — trust it over the format/API check, but
+  // only if the submitted identity matches what SSO attested.
   let verification;
   if (ssoTicket) {
     let attested;
     try {
       attested = kmitlOidc.verifySsoTicket(ssoTicket);
     } catch {
+      res.clearCookie(SSO_TICKET_COOKIE, clearSsoTicketCookieOptions());
       throw ApiError.badRequest('KMITL SSO ticket is invalid or expired, please sign in with KMITL again');
     }
     if (attested.studentId !== studentId || attested.email !== normalizedEmail) {
@@ -96,6 +104,7 @@ const register = asyncHandler(async (req, res) => {
     verificationMethod: verification.method,
   });
 
+  res.clearCookie(SSO_TICKET_COOKIE, clearSsoTicketCookieOptions());
   const accessToken = await issueSession(res, user);
 
   res.status(201).json({
@@ -233,9 +242,10 @@ const kmitlSsoStart = asyncHandler(async (_req, res) => {
 /**
  * GET /api/auth/kmitl/callback
  * OIDC redirect target. Exchanges the code, resolves the KMITL identity,
- * then either logs the student in (existing account) or hands the register
- * page a short-lived SSO ticket (new account). Always redirects back to the
- * client, encoding errors in the query string so the UI can display them.
+ * then either logs the student in (existing account) or sets a short-lived
+ * httpOnly SSO ticket cookie for registration (new account). Always redirects
+ * back to the client, encoding errors in the query string so the UI can
+ * display them.
  */
 const kmitlSsoCallback = asyncHandler(async (req, res) => {
   const clientUrl = env.clientUrl.replace(/\/$/, '');
@@ -296,15 +306,48 @@ const kmitlSsoCallback = asyncHandler(async (req, res) => {
     return res.redirect(`${clientUrl}/?sso=success`);
   }
 
-  // New student: send them to finish registration with a verified-identity ticket.
+  // New student: set a verified-identity ticket cookie, then send them to
+  // finish registration (ticket never appears in the URL or response body).
   const ticket = kmitlOidc.createSsoTicket(identity);
-  return res.redirect(`${clientUrl}/register?ssoTicket=${encodeURIComponent(ticket)}`);
+  res.cookie(SSO_TICKET_COOKIE, ticket, ssoTicketCookieOptions());
+  return res.redirect(`${clientUrl}/register`);
+});
+
+/**
+ * GET /api/auth/sso-prefill
+ * Returns the identity attested by the httpOnly SSO ticket cookie so the
+ * register form can prefill studentId/email/year without reading the JWT
+ * in the browser.
+ */
+const ssoPrefill = asyncHandler(async (req, res) => {
+  const ticket = req.cookies?.[SSO_TICKET_COOKIE];
+  if (!ticket) {
+    throw ApiError.badRequest('No KMITL SSO registration session found');
+  }
+
+  let attested;
+  try {
+    attested = kmitlOidc.verifySsoTicket(ticket);
+  } catch {
+    res.clearCookie(SSO_TICKET_COOKIE, clearSsoTicketCookieOptions());
+    throw ApiError.badRequest('KMITL SSO ticket is invalid or expired, please sign in with KMITL again');
+  }
+
+  res.json({
+    success: true,
+    data: {
+      studentId: attested.studentId,
+      email: attested.email,
+      year: attested.year,
+    },
+  });
 });
 
 /**
  * POST /api/auth/forgot-password
- * Verifies studentId + email match, then issues a short-lived reset token.
- * (No email delivery yet — the client continues to the reset form with the token.)
+ * Verifies studentId + email match, then sets a short-lived reset token
+ * cookie. (No email delivery yet — the client continues to the reset form;
+ * the token is never returned in the JSON body.)
  */
 const forgotPassword = asyncHandler(async (req, res) => {
   const { studentId, email } = req.body;
@@ -316,11 +359,11 @@ const forgotPassword = asyncHandler(async (req, res) => {
   }
 
   const resetToken = signPasswordResetToken(user);
+  res.cookie(RESET_TOKEN_COOKIE, resetToken, resetTokenCookieOptions());
 
   res.json({
     success: true,
     data: {
-      resetToken,
       expiresIn: '15m',
       message: 'Identity verified. You can set a new password now.',
     },
@@ -329,25 +372,37 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
 /**
  * POST /api/auth/reset-password
+ * Reads the reset token from the httpOnly cookie (not the request body).
  */
 const resetPassword = asyncHandler(async (req, res) => {
-  const { resetToken, password } = req.body;
+  const { password } = req.body;
+  const resetToken = req.cookies?.[RESET_TOKEN_COOKIE];
+
+  if (!resetToken) {
+    throw ApiError.badRequest('Reset session is missing or expired. Please try again.');
+  }
 
   let payload;
   try {
     payload = verifyPasswordResetToken(resetToken);
   } catch {
+    res.clearCookie(RESET_TOKEN_COOKIE, clearResetTokenCookieOptions());
     throw ApiError.badRequest('Reset link is invalid or expired. Please try again.');
   }
 
   const user = await User.findById(payload.sub).select('+passwordHash');
-  if (!user) throw ApiError.notFound('User not found');
+  if (!user) {
+    res.clearCookie(RESET_TOKEN_COOKIE, clearResetTokenCookieOptions());
+    throw ApiError.notFound('User not found');
+  }
 
   user.passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
   // Force re-login after reset
   user.refreshTokenHash = null;
   user.refreshTokenExpiresAt = null;
   await user.save();
+
+  res.clearCookie(RESET_TOKEN_COOKIE, clearResetTokenCookieOptions());
 
   res.json({
     success: true,
@@ -363,6 +418,7 @@ module.exports = {
   me,
   kmitlSsoStart,
   kmitlSsoCallback,
+  ssoPrefill,
   forgotPassword,
   resetPassword,
 };

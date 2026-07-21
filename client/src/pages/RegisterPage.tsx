@@ -1,13 +1,13 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Layout } from '@/components/Layout'
 import { AuthCard } from '@/components/AuthCard'
 import { PasswordInput } from '@/components/PasswordInput'
 import { useAuth } from '@/context/AuthContext'
 import { useLocale } from '@/context/LocaleContext'
-import { decodeSsoTicket } from '@/api/auth'
+import { fetchSsoPrefill, type SsoPrefill } from '@/api/auth'
 import { registerSchema, type RegisterFormValues } from '@/lib/schemas'
 import { KMITL_FACULTIES, majorsForFaculty } from '@/lib/moods'
 
@@ -15,31 +15,40 @@ export function RegisterPage() {
   const { register: registerUser } = useAuth()
   const { t } = useLocale()
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
   const [submitError, setSubmitError] = useState<string | null>(null)
-
-  const ssoTicket = searchParams.get('ssoTicket') ?? undefined
-  const ssoIdentity = useMemo(
-    () => (ssoTicket ? decodeSsoTicket(ssoTicket) : null),
-    [ssoTicket],
-  )
+  const [ssoIdentity, setSsoIdentity] = useState<SsoPrefill | null>(null)
+  const [ssoLoading, setSsoLoading] = useState(true)
 
   const {
     register,
     handleSubmit,
     watch,
     setValue,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: ssoIdentity
-      ? {
-          studentId: ssoIdentity.studentId,
-          email: ssoIdentity.email,
-          ...(ssoIdentity.year != null ? { year: ssoIdentity.year } : {}),
-        }
-      : undefined,
   })
+
+  useEffect(() => {
+    let mounted = true
+    fetchSsoPrefill()
+      .then((identity) => {
+        if (!mounted || !identity) return
+        setSsoIdentity(identity)
+        reset({
+          studentId: identity.studentId,
+          email: identity.email,
+          ...(identity.year != null ? { year: identity.year } : {}),
+        })
+      })
+      .finally(() => {
+        if (mounted) setSsoLoading(false)
+      })
+    return () => {
+      mounted = false
+    }
+  }, [reset])
 
   const selectedFaculty = watch('faculty') || ''
   const selectedYear = watch('year')
@@ -49,7 +58,7 @@ export function RegisterPage() {
   async function onSubmit(values: RegisterFormValues) {
     setSubmitError(null)
     try {
-      await registerUser(values, ssoTicket)
+      await registerUser(values)
       navigate('/', { replace: true })
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : t('registerFailed'))
@@ -91,6 +100,7 @@ export function RegisterPage() {
               inputMode="numeric"
               placeholder="65010001"
               readOnly={Boolean(ssoIdentity)}
+              disabled={ssoLoading}
               autoComplete="username"
               className="auth-input"
             />
@@ -109,6 +119,7 @@ export function RegisterPage() {
               type="email"
               placeholder="65010001@kmitl.ac.th"
               readOnly={Boolean(ssoIdentity)}
+              disabled={ssoLoading}
               autoComplete="email"
               className="auth-input"
             />
@@ -244,7 +255,7 @@ export function RegisterPage() {
             </p>
           )}
 
-          <button type="submit" disabled={isSubmitting} className="auth-btn-primary">
+          <button type="submit" disabled={isSubmitting || ssoLoading} className="auth-btn-primary">
             {isSubmitting ? t('registerSubmitting') : t('registerSubmit')}
           </button>
         </form>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Layout } from '@/components/Layout'
 import { AuthCard } from '@/components/AuthCard'
 import { PasswordInput } from '@/components/PasswordInput'
@@ -12,11 +12,7 @@ import { resetPasswordSchema, type ResetPasswordFormValues } from '@/lib/schemas
 export function ResetPasswordPage() {
   const { t } = useLocale()
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const resetToken = searchParams.get('token') ?? ''
-  const [submitError, setSubmitError] = useState<string | null>(
-    resetToken ? null : t('resetMissingToken'),
-  )
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
   const {
@@ -28,13 +24,9 @@ export function ResetPasswordPage() {
   })
 
   async function onSubmit(values: ResetPasswordFormValues) {
-    if (!resetToken) {
-      setSubmitError(t('resetMissingToken'))
-      return
-    }
     setSubmitError(null)
     try {
-      await resetPassword(resetToken, values)
+      await resetPassword(values)
       setSuccess(true)
       window.setTimeout(() => navigate('/login', { replace: true }), 1600)
     } catch (err) {
@@ -98,11 +90,7 @@ export function ResetPasswordPage() {
               </p>
             )}
 
-            <button
-              type="submit"
-              disabled={isSubmitting || !resetToken}
-              className="auth-btn-primary"
-            >
+            <button type="submit" disabled={isSubmitting} className="auth-btn-primary">
               {isSubmitting ? t('resetSubmitting') : t('resetSubmit')}
             </button>
           </form>

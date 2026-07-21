@@ -18,7 +18,7 @@ interface AuthContextValue {
   isAdmin: boolean
   isBootstrapping: boolean
   login: (values: LoginFormValues) => Promise<void>
-  register: (values: RegisterFormValues, ssoTicket?: string) => Promise<void>
+  register: (values: RegisterFormValues) => Promise<void>
   logout: () => Promise<void>
 }
 
@@ -50,9 +50,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(loggedInUser)
   }, [])
 
-  const register = useCallback(async (values: RegisterFormValues, ssoTicket?: string) => {
+  const register = useCallback(async (values: RegisterFormValues) => {
     const { confirmPassword: _confirmPassword, ...rest } = values
-    const { user: newUser } = await authApi.register(rest, ssoTicket)
+    const { user: newUser } = await authApi.register(rest)
     setUser(newUser)
   }, [])
 

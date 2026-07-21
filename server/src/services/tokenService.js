@@ -56,15 +56,30 @@ function refreshExpiryDate() {
 }
 
 const REFRESH_COOKIE_NAME = 'refreshToken';
+const SSO_TICKET_COOKIE = 'ssoTicket';
+const RESET_TOKEN_COOKIE = 'resetToken';
+const SHORT_LIVED_COOKIE_MAX_AGE_MS = durationMs('15m');
 
-function refreshCookieOptions() {
+function baseAuthCookieOptions(maxAge) {
   return {
     httpOnly: true,
     secure: env.nodeEnv === 'production',
     sameSite: env.nodeEnv === 'production' ? 'none' : 'lax',
     path: '/api/auth',
-    maxAge: durationMs(env.jwt.refreshExpiresIn),
+    maxAge,
   };
+}
+
+function refreshCookieOptions() {
+  return baseAuthCookieOptions(durationMs(env.jwt.refreshExpiresIn));
+}
+
+function ssoTicketCookieOptions() {
+  return baseAuthCookieOptions(SHORT_LIVED_COOKIE_MAX_AGE_MS);
+}
+
+function resetTokenCookieOptions() {
+  return baseAuthCookieOptions(SHORT_LIVED_COOKIE_MAX_AGE_MS);
 }
 
 // clearCookie must match the attributes used when the cookie was set,
@@ -72,6 +87,16 @@ function refreshCookieOptions() {
 // silently restores the session.
 function clearRefreshCookieOptions() {
   const { maxAge: _maxAge, ...opts } = refreshCookieOptions();
+  return opts;
+}
+
+function clearSsoTicketCookieOptions() {
+  const { maxAge: _maxAge, ...opts } = ssoTicketCookieOptions();
+  return opts;
+}
+
+function clearResetTokenCookieOptions() {
+  const { maxAge: _maxAge, ...opts } = resetTokenCookieOptions();
   return opts;
 }
 
@@ -86,5 +111,11 @@ module.exports = {
   refreshExpiryDate,
   refreshCookieOptions,
   clearRefreshCookieOptions,
+  ssoTicketCookieOptions,
+  clearSsoTicketCookieOptions,
+  resetTokenCookieOptions,
+  clearResetTokenCookieOptions,
   REFRESH_COOKIE_NAME,
+  SSO_TICKET_COOKIE,
+  RESET_TOKEN_COOKIE,
 };

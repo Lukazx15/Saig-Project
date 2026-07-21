@@ -120,7 +120,7 @@ router.get('/kmitl', authController.kmitlSsoStart);
  *         schema: { type: string }
  *     responses:
  *       302:
- *         description: Redirect to the client (logged in, register with ticket, or error)
+ *         description: Redirect to the client (logged in, register with SSO cookie, or error)
  */
 router.get('/kmitl/callback', authController.kmitlSsoCallback);
 
@@ -141,9 +141,23 @@ router.get('/me', authenticate, authController.me);
 
 /**
  * @openapi
+ * /api/auth/sso-prefill:
+ *   get:
+ *     summary: Prefill register form from the httpOnly SSO ticket cookie
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Attested studentId, email, and optional year
+ *       400:
+ *         description: Missing, invalid, or expired SSO ticket cookie
+ */
+router.get('/sso-prefill', authController.ssoPrefill);
+
+/**
+ * @openapi
  * /api/auth/forgot-password:
  *   post:
- *     summary: Verify studentId + email and issue a password-reset token
+ *     summary: Verify studentId + email and set a password-reset cookie
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -157,7 +171,7 @@ router.get('/me', authenticate, authController.me);
  *               email: { type: string, example: "65010001@kmitl.ac.th" }
  *     responses:
  *       200:
- *         description: Reset token issued
+ *         description: Reset session cookie set (token not returned in body)
  *       400:
  *         description: Identity not found or invalid
  */
@@ -172,7 +186,7 @@ router.post(
  * @openapi
  * /api/auth/reset-password:
  *   post:
- *     summary: Set a new password using a reset token
+ *     summary: Set a new password using the httpOnly reset cookie
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -180,15 +194,14 @@ router.post(
  *         application/json:
  *           schema:
  *             type: object
- *             required: [resetToken, password]
+ *             required: [password]
  *             properties:
- *               resetToken: { type: string }
  *               password: { type: string, example: "NewSecret123" }
  *     responses:
  *       200:
  *         description: Password updated
  *       400:
- *         description: Invalid or expired token
+ *         description: Invalid or expired reset session
  */
 router.post(
   '/reset-password',

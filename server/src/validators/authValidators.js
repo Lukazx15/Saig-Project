@@ -21,10 +21,6 @@ const registerValidator = [
   body('password')
     .isLength({ min: 8 })
     .withMessage('password must be at least 8 characters long'),
-  body('ssoTicket')
-    .optional()
-    .isString()
-    .withMessage('ssoTicket must be a string'),
 ];
 
 const loginValidator = [
@@ -51,7 +47,6 @@ const forgotPasswordValidator = [
 ];
 
 const resetPasswordValidator = [
-  body('resetToken').trim().notEmpty().withMessage('resetToken is required'),
   body('password')
     .isLength({ min: 8 })
     .withMessage('password must be at least 8 characters long'),

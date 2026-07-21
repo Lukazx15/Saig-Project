@@ -16,7 +16,6 @@ async function applyAuth(raw: unknown): Promise<AuthResponse> {
 
 export async function register(
   values: Omit<RegisterFormValues, 'confirmPassword'>,
-  ssoTicket?: string,
 ): Promise<AuthResponse> {
   try {
     const { data } = await api.post('/auth/register', {
@@ -26,7 +25,6 @@ export async function register(
       major: values.major,
       year: values.year,
       password: values.password,
-      ...(ssoTicket ? { ssoTicket } : {}),
     })
     return applyAuth(data)
   } catch (err) {
@@ -39,15 +37,25 @@ export function loginWithKmitl() {
   window.location.href = `${API_BASE_URL}/api/auth/kmitl`
 }
 
-/** Reads studentId/email/year out of an SSO register ticket (display only — the server re-verifies). */
-export function decodeSsoTicket(
-  ticket: string,
-): { studentId: string; email: string; year: number | null } | null {
+export type SsoPrefill = {
+  studentId: string
+  email: string
+  year: number | null
+}
+
+/** Reads SSO-attested identity from the httpOnly ticket cookie (display only). */
+export async function fetchSsoPrefill(): Promise<SsoPrefill | null> {
   try {
-    const payload = JSON.parse(atob(ticket.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
-    if (typeof payload.studentId === 'string' && typeof payload.email === 'string') {
+    const { data } = await api.get('/auth/sso-prefill')
+    const payload = data?.data ?? data
+    if (
+      typeof payload?.studentId === 'string' &&
+      typeof payload?.email === 'string'
+    ) {
       const year =
-        typeof payload.year === 'number' && Number.isInteger(payload.year) ? payload.year : null
+        typeof payload.year === 'number' && Number.isInteger(payload.year)
+          ? payload.year
+          : null
       return { studentId: payload.studentId, email: payload.email, year }
     }
     return null
@@ -68,31 +76,20 @@ export async function login(values: LoginFormValues): Promise<AuthResponse> {
   }
 }
 
-export async function forgotPassword(
-  values: ForgotPasswordFormValues,
-): Promise<string> {
+export async function forgotPassword(values: ForgotPasswordFormValues): Promise<void> {
   try {
-    const { data } = await api.post('/auth/forgot-password', {
+    await api.post('/auth/forgot-password', {
       studentId: values.studentId,
       email: values.email,
     })
-    const token = data?.data?.resetToken ?? data?.resetToken
-    if (!token || typeof token !== 'string') {
-      throw new Error('Could not start password reset')
-    }
-    return token
   } catch (err) {
     throw new Error(getErrorMessage(err, 'Could not verify your account'))
   }
 }
 
-export async function resetPassword(
-  resetToken: string,
-  values: ResetPasswordFormValues,
-): Promise<void> {
+export async function resetPassword(values: ResetPasswordFormValues): Promise<void> {
   try {
     await api.post('/auth/reset-password', {
-      resetToken,
       password: values.password,
     })
   } catch (err) {
