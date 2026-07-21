@@ -110,46 +110,17 @@ export async function refresh(): Promise<AuthResponse | null> {
   }
 }
 
-/** Hit KMITL end_session in a hidden iframe so SSO cookies clear without a visible redirect. */
-function clearKmitlSsoSilently(logoutUrl: string): Promise<void> {
-  return new Promise((resolve) => {
-    const iframe = document.createElement('iframe')
-    iframe.setAttribute('aria-hidden', 'true')
-    iframe.tabIndex = -1
-    iframe.style.cssText =
-      'position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none'
-    const done = () => {
-      iframe.remove()
-      resolve()
-    }
-    iframe.onload = () => done()
-    iframe.onerror = () => done()
-    // Cap wait — some IdPs never fire load reliably across origins.
-    window.setTimeout(done, 1500)
-    iframe.src = logoutUrl
-    document.body.appendChild(iframe)
-  })
-}
-
 export async function logout(): Promise<void> {
-  let kmitlLogoutUrl: string | null = null
   try {
-    const { data } = await api.post('/auth/logout')
-    kmitlLogoutUrl =
-      data?.data?.kmitlLogoutUrl ?? data?.kmitlLogoutUrl ?? null
+    await api.post('/auth/logout')
   } catch {
     // ignore network errors on logout
   } finally {
     setAccessToken(null)
   }
-
-  if (kmitlLogoutUrl) {
-    try {
-      await clearKmitlSsoSilently(kmitlLogoutUrl)
-    } catch {
-      // App session is already cleared; SSO prompt=login covers leftovers.
-    }
-  }
+  // KMITL SSO sets CSP frame-ancestors 'self', so a hidden iframe end_session
+  // is blocked. Local session is cleared above; the next KMITL login uses
+  // prompt=login so a leftover IdP cookie cannot silently re-auth.
 }
 
 export async function fetchCurrentUser(): Promise<User | null> {

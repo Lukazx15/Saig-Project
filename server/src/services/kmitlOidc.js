@@ -69,8 +69,10 @@ async function buildAuthorizationUrl() {
 
 /**
  * RP-initiated logout URL for KMITL Keycloak.
- * No post_logout_redirect_uri — the client loads this in a hidden iframe
- * so the IdP cookie is cleared without navigating the user away.
+ * Kept for API completeness / future top-level redirect. A hidden iframe
+ * cannot clear the IdP session — sso.kmitl.ac.th sends
+ * Content-Security-Policy: frame-ancestors 'self'. App logout therefore
+ * relies on prompt=login on the next authorization request instead.
  */
 async function buildLogoutUrl() {
   if (!isEnabled()) return null;
