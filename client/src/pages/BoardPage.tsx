@@ -22,6 +22,7 @@ export function BoardPage() {
   const [isComposeOpen, setIsComposeOpen] = useState(false)
   const [editingNote, setEditingNote] = useState<MoodNote | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [straightenedId, setStraightenedId] = useState<string | null>(null)
 
   function handleComposeClick() {
     if (!isAuthenticated) {
@@ -108,12 +109,20 @@ export function BoardPage() {
                 filters.dateTo,
               ].join('|')}
               className="grid grid-cols-2 items-start gap-x-1 gap-y-4 sm:grid-cols-3 sm:gap-x-2 sm:gap-y-6 md:grid-cols-4"
+              onPointerDown={(e) => {
+                // Tap empty cork → put notes back at an angle
+                if (e.target === e.currentTarget) setStraightenedId(null)
+              }}
             >
               <AnimatePresence mode="popLayout">
                 {moods.map((note) => (
                   <PostIt
                     key={note.id}
                     note={note}
+                    straightened={straightenedId === note.id}
+                    onStraighten={(n) =>
+                      setStraightenedId((current) => (current === n.id ? null : n.id))
+                    }
                     onEdit={(n) => setEditingNote(n)}
                     onDelete={handleDelete}
                   />

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type PointerEvent } from 'react'
 import { motion } from 'framer-motion'
 import { PinIcon } from '@/components/PinIcon'
 import { MOOD_META, pinOffsetForId, pinOffsetXForId, pinSizeForId, rotationForId } from '@/lib/moods'
@@ -8,6 +8,9 @@ import { MOOD_LABEL_KEYS } from '@/i18n'
 
 interface PostItProps {
   note: MoodNote
+  /** When true (tap on mobile / hover on desktop), note sits straight for reading. */
+  straightened?: boolean
+  onStraighten?: (note: MoodNote) => void
   onEdit?: (note: MoodNote) => void
   onDelete?: (note: MoodNote) => void
 }
@@ -29,31 +32,50 @@ const SIZE_CLASS = {
   tall: 'min-h-[13.5rem] sm:min-h-[16.5rem]',
 } as const
 
-export function PostIt({ note, onEdit, onDelete }: PostItProps) {
+export function PostIt({ note, straightened = false, onStraighten, onEdit, onDelete }: PostItProps) {
   const { t, locale } = useLocale()
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [hovered, setHovered] = useState(false)
   const rotation = note.rotation ?? rotationForId(note.id)
   const offsetY = pinOffsetForId(note.id)
   const offsetX = pinOffsetXForId(note.id)
   const size = pinSizeForId(note.id)
   const meta = MOOD_META[note.moodType]
   const zBase = (Math.abs(pinOffsetForId(note.id)) % 5) + 1
+  const isStraight = straightened || hovered || confirmDelete
+
+  function handlePointerUp(event: PointerEvent<HTMLElement>) {
+    if ((event.target as HTMLElement).closest('button')) return
+    // Touch / pen: tap toggles straighten (hover does not work on mobile).
+    if (event.pointerType === 'touch' || event.pointerType === 'pen') {
+      onStraighten?.(note)
+    }
+  }
 
   return (
     <motion.article
       layout
       initial={{ opacity: 0, y: -28, scale: 0.88, rotate: 0 }}
-      animate={{ opacity: 1, x: offsetX, y: offsetY, scale: 1, rotate: rotation }}
+      animate={{
+        opacity: 1,
+        x: offsetX,
+        y: isStraight ? offsetY - 2 : offsetY,
+        scale: isStraight ? 1.03 : 1,
+        rotate: isStraight ? 0 : rotation,
+        zIndex: isStraight ? 20 : zBase,
+      }}
       exit={{ opacity: 0, scale: 0.82, transition: { duration: 0.18 } }}
-      whileHover={{ rotate: 0, scale: 1.03, zIndex: 20, y: offsetY - 2 }}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
+      onPointerUp={handlePointerUp}
       transition={{
         layout: { type: 'spring', stiffness: 380, damping: 32 },
         type: 'spring',
         stiffness: 320,
         damping: 22,
       }}
-      className={`postit-shadow group relative -mb-2 flex w-full flex-col justify-between rounded-sm p-3 sm:-mb-3 sm:p-4 ${SIZE_CLASS[size]}`}
-      style={{ backgroundColor: note.color, zIndex: zBase }}
+      className={`postit-shadow group relative -mb-2 flex w-full cursor-pointer flex-col justify-between rounded-sm p-3 touch-manipulation sm:-mb-3 sm:p-4 ${SIZE_CLASS[size]}`}
+      style={{ backgroundColor: note.color, zIndex: isStraight ? 20 : zBase }}
     >
       <div className="pin-shadow absolute -top-3 left-1/2 -translate-x-1/2">
         <PinIcon className="h-6 w-6" />
