@@ -82,11 +82,13 @@ JWT_REFRESH_EXPIRES_IN=7d
 npm run seed:admin
 ```
 
-4. Set `KMITL_OIDC_REDIRECT_URI` to:
+4. Set `KMITL_OIDC_REDIRECT_URI` to the **Vercel** callback (proxied to Render):
 
 ```text
-https://<api-host>/api/auth/kmitl/callback
+https://your-app.vercel.app/api/auth/kmitl/callback
 ```
+
+Do **not** use the raw `*.onrender.com` callback in production — cookies must be set on the Vercel host.
 
 ---
 
@@ -105,14 +107,22 @@ https://<api-host>/api/auth/kmitl/callback
 3. Environment variable (**Production**):
 
 ```text
-VITE_API_URL=https://<api-host>
+VITE_API_URL=
 ```
 
-No trailing slash. This is baked in at **build** time — change it → redeploy.
+Leave **empty** (or omit). The client then calls same-origin `/api/...`, and `client/vercel.json` proxies those requests to Render. That is required so httpOnly cookies (`refreshToken`, `ssoTicket`) are first-party — a cross-origin `VITE_API_URL=https://….onrender.com` breaks SSO registration and session refresh in modern browsers.
+
+If you must set it explicitly, use the Vercel origin itself:
+
+```text
+VITE_API_URL=https://your-app.vercel.app
+```
+
+Never point production `VITE_API_URL` at the Render hostname.
 
 4. Deploy. Note the URL: `https://your-app.vercel.app`.
 
-`client/vercel.json` already rewrites all routes to `index.html` for React Router.
+`client/vercel.json` proxies `/api/*` → Render, then falls back to `index.html` for React Router.
 
 ---
 
@@ -128,11 +138,13 @@ Exact origin, HTTPS, no trailing slash. Then **redeploy** the API.
 
 2. On **Vercel**, confirm `VITE_API_URL` points at the Render API. Redeploy if needed.
 
-3. (SSO) In the KMITL developer console, add redirect URI:
+3. (SSO) In the KMITL developer console, set redirect URI to:
 
 ```text
-https://<api-host>/api/auth/kmitl/callback
+https://your-app.vercel.app/api/auth/kmitl/callback
 ```
+
+Match `KMITL_OIDC_REDIRECT_URI` on Render exactly.
 
 ---
 
@@ -153,7 +165,8 @@ https://<api-host>/api/auth/kmitl/callback
 |---------|------------|
 | CORS error | `CLIENT_URL` must match the Vercel origin exactly |
 | Login works then immediately logs out | Both sides must be HTTPS; `NODE_ENV=production` on Render |
-| Frontend still hits localhost | Rebuild Vercel after setting `VITE_API_URL` |
+| Frontend still hits localhost / onrender | Clear `VITE_API_URL` on Vercel and redeploy so calls go to `/api` |
+| `No KMITL SSO registration session found` | Cross-site cookie — use same-origin `/api` proxy + Vercel redirect URI |
 | Atlas connection refused | Network Access / wrong URI / URL-encoded password |
 | Free Render cold start | First request after idle can take ~30–60s |
 | SSO fails | Redirect URI mismatch in KMITL console vs `KMITL_OIDC_REDIRECT_URI` |
@@ -168,4 +181,5 @@ https://<api-host>/api/auth/kmitl/callback
 | API | `npm run dev:server` → `:4000` | Render |
 | Client | `npm run dev:client` → `:5173` | Vercel |
 | `CLIENT_URL` | `http://localhost:5173` | `https://….vercel.app` |
-| `VITE_API_URL` | `http://localhost:4000` | `https://….onrender.com` |
+| `VITE_API_URL` | `http://localhost:4000` | empty / same Vercel origin (proxy `/api`) |
+| SSO redirect URI | `http://localhost:4000/api/auth/kmitl/callback` | `https://….vercel.app/api/auth/kmitl/callback` |

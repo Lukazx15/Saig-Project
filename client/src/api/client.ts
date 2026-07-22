@@ -1,8 +1,11 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
 
+// Production on Vercel proxies /api → Render (see vercel.json), so the
+ // browser talks same-origin and httpOnly cookies (refresh / SSO ticket) work.
+ // Locally, default to the Express dev server unless VITE_API_URL overrides.
 export const API_BASE_URL =
   (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') ||
-  'http://localhost:4000'
+  (import.meta.env.DEV ? 'http://localhost:4000' : '')
 
 /** In-memory access token — never persisted to storage (XSS-safer). */
 let accessToken: string | null = null
