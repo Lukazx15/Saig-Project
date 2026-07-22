@@ -1,53 +1,137 @@
-# Mood of the Major (Saig-Project)
+# Mood of the Major
 
-Anonymous mood-sharing corkboard for KMITL students. Students pin post-it notes with their mood; the board stays calm, colorful, and privacy-first.
+Anonymous mood-sharing corkboard for **KMITL** students. Sign in with your student identity, pin a short post-it with how you feel, and browse the campus board — without exposing anyone’s real name or student ID.
 
-## Monorepo layout
+Public notes show only an **alias**, **faculty**, **major**, and **year**.
 
-| Path | Purpose |
-|------|---------|
-| `client/` | React + Vite + Tailwind frontend (Phase 2+) |
-| `server/` | Express + Mongoose API (Phase 2+) |
-| `docker-compose.yml` | Local MongoDB 7 on port `27017` |
+---
+
+## Features
+
+- **Corkboard feed** — color-coded mood notes (happy, calm, tired, stressed, sad, excited, angry) with filter, search, and pagination
+- **Anonymous by design** — real identity stays on the server; the API never returns student ID, name, or email on moods
+- **KMITL auth** — register/login with student ID + `@kmitl.ac.th` email; optional **KMITL SSO** (OIDC)
+- **Campus Vibe** — mood distribution and faculty breakdown (`/stats`)
+- **Admin moderation** — remove inappropriate notes (`/admin`)
+- **API docs** — Swagger UI at `/api-docs`
+
+---
+
+## Stack
+
+| Layer | Tech |
+|-------|------|
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS 4, Framer Motion |
+| Backend | Express 4, Mongoose 8 (CommonJS) |
+| Database | MongoDB 7 (Docker Compose locally) |
+| Deploy (optional) | Render (API) + Vercel (client) — see [DEPLOY.md](./DEPLOY.md) |
+
+---
+
+## Repository layout
+
+```text
+├── client/              # React SPA (Vite)
+├── server/              # Express API
+├── docker-compose.yml   # Local MongoDB (saig-mongo :27017)
+├── render.yaml          # Render blueprint for the API
+└── DEPLOY.md            # Production deploy checklist
+```
+
+---
 
 ## Prerequisites
 
-- Node.js 20+
-- Docker Desktop (preferred for MongoDB), **or** a local MongoDB / Atlas connection string
-- GitHub CLI (`gh`) for repo workflows
+- **Node.js 20+**
+- **Docker** (recommended for MongoDB), or any MongoDB URI (Atlas, local install, etc.)
 
-## Local MongoDB
+---
 
-```bash
-docker compose up -d
-```
-
-Connection string (default):
-
-```text
-mongodb://127.0.0.1:27017/mood-of-the-major
-```
-
-If Docker is unavailable, use a MongoDB MCP local Atlas deployment (or any MongoDB URI) and set `MONGODB_URI` in `server/.env` once the server is scaffolded.
-
-## Development (after Phase 2 scaffolding)
+## Quick start
 
 ```bash
+# 1. Install dependencies
 npm run install:all
+
+# 2. Env files
+cp server/.env.example server/.env
+cp client/.env.example client/.env
+
+# 3. Start MongoDB
 npm run docker:up
-npm run dev:server
-npm run dev:client
+
+# 4. Seed a local admin account (once)
+cd server && npm run seed:admin && cd ..
+
+# 5. Run API + client (separate terminals)
+npm run dev:server   # http://localhost:4000
+npm run dev:client   # http://localhost:5173
 ```
 
-## Production deploy (Render + Vercel)
+| Service | URL |
+|---------|-----|
+| Client | http://localhost:5173 |
+| API | http://localhost:4000 |
+| Swagger | http://localhost:4000/api-docs |
 
-See **[DEPLOY.md](./DEPLOY.md)** for the full checklist:
+Default MongoDB URI: `mongodb://127.0.0.1:27017/mood-of-the-major`
 
-1. MongoDB Atlas
-2. Render Web Service from `render.yaml` (API, root `server/`)
-3. Vercel project (client, root `client/`, env `VITE_API_URL`)
-4. Set Render `CLIENT_URL` to the Vercel origin and redeploy
+---
 
-## Status
+## Environment
 
-Feature-complete for local development. Cloud deploy config is in `render.yaml`, `client/vercel.json`, and `DEPLOY.md`.
+### Server (`server/.env`)
+
+| Variable | Purpose |
+|----------|---------|
+| `PORT` | API port (default `4000`) |
+| `MONGODB_URI` | Mongo connection string |
+| `CLIENT_URL` | Frontend origin (CORS + cookies), e.g. `http://localhost:5173` |
+| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | JWT signing secrets |
+| `ADMIN_*` | Values used by `npm run seed:admin` |
+| `KMITL_OIDC_CLIENT_ID` / `SECRET` | Optional — enable “Sign in with KMITL” |
+| `KMITL_API_KEY` | Optional — live KMITL profile API (otherwise format-check fallback) |
+
+### Client (`client/.env`)
+
+```bash
+VITE_API_URL=http://localhost:4000
+```
+
+---
+
+## Auth & privacy (short)
+
+- **Access token** (15m) in the response body — kept in memory on the client, not `localStorage`
+- **Refresh token** (7d) in an httpOnly cookie under `/api/auth`; rotated on refresh
+- Mood responses go through `Mood.toPublicJSON()` — only alias / faculty / major / year (plus viewer flags like `isOwner`)
+
+---
+
+## Scripts (repo root)
+
+| Script | What it does |
+|--------|----------------|
+| `npm run install:all` | Install server + client deps |
+| `npm run docker:up` / `docker:down` | Start / stop MongoDB |
+| `npm run dev:server` | API with nodemon |
+| `npm run dev:client` | Vite dev server |
+
+From `server/`: `npm run seed:admin` creates the local admin user.
+
+**Local admin (dev only):** studentId `99999999` · password `Admin123!`  
+(Configurable via `ADMIN_*` in `server/.env`. Do not use real KMITL credentials.)
+
+---
+
+## Deploy
+
+Production target is **MongoDB Atlas + Render (API) + Vercel (client)**.
+
+Full steps, env vars, and cookie/CORS notes: **[DEPLOY.md](./DEPLOY.md)**.
+
+---
+
+## License
+
+Private student project (`Saig-Project`).
