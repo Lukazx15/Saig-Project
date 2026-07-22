@@ -73,7 +73,7 @@ export const en: Messages = {
   registerSelectFacultyFirst: 'Select faculty first…',
 
   boardTitle: "How's the major feeling today?",
-  boardSubtitle: 'Anonymous mood notes from KMITL — pin one, or just browse.',
+  boardSubtitle: 'Anonymous mood notes from FRIENDLY NEIGHBORS',
   boardLoading: 'Fetching the board…',
   boardEmpty: 'No notes match these filters yet. Be the first to pin one!',
   boardPinCta: 'Pin a mood',

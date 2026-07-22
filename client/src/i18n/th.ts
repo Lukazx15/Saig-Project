@@ -76,7 +76,7 @@ export const th: Messages = {
   registerSelectFacultyFirst: 'เลือกคณะก่อน…',
 
   boardTitle: 'วันนี้สาขามู้ดไหน?',
-  boardSubtitle: 'โน้ตอารมณ์ไม่ระบุชื่อจากเพื่อนใน KMITL — จะปักเองหรือแอบอ่านก็ได้',
+  boardSubtitle: 'โน้ตอารมณ์ไม่ระบุชื่อจากเพื่อนขี้เสือกใน KMITL',
   boardLoading: 'กำลังดึงกระดาน…',
   boardEmpty: 'ยังไม่มีโน้ตตามตัวกรองนี้ เป็นคนแรกที่ปักเลยไหม',
   boardPinCta: 'ปักอารมณ์',
