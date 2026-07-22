@@ -27,16 +27,18 @@ function formatDate(iso: string, locale: string) {
 }
 
 const SIZE_CLASS = {
-  short: 'min-h-[10.5rem] sm:min-h-[12.5rem]',
-  medium: 'min-h-[12rem] sm:min-h-[14.5rem]',
-  tall: 'min-h-[13.5rem] sm:min-h-[16.5rem]',
+  short: 'min-h-[11rem] sm:min-h-[12.5rem]',
+  medium: 'min-h-[11.5rem] sm:min-h-[14.5rem]',
+  tall: 'min-h-[12rem] sm:min-h-[16.5rem]',
 } as const
 
 export function PostIt({ note, straightened = false, onStraighten, onEdit, onDelete }: PostItProps) {
   const { t, locale } = useLocale()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [hovered, setHovered] = useState(false)
-  const rotation = note.rotation ?? rotationForId(note.id)
+  const rawRotation = note.rotation ?? rotationForId(note.id)
+  // Clamp server/client tilt so rotated corners don't eat the next note on mobile.
+  const rotation = Math.max(-3.5, Math.min(3.5, rawRotation))
   const offsetY = pinOffsetForId(note.id)
   const offsetX = pinOffsetXForId(note.id)
   const size = pinSizeForId(note.id)
@@ -74,7 +76,7 @@ export function PostIt({ note, straightened = false, onStraighten, onEdit, onDel
         stiffness: 320,
         damping: 22,
       }}
-      className={`postit-shadow group relative -mb-2 flex w-full cursor-pointer flex-col justify-between rounded-sm p-3 touch-manipulation sm:-mb-3 sm:p-4 ${SIZE_CLASS[size]}`}
+      className={`postit-shadow group relative flex w-full cursor-pointer flex-col justify-between rounded-sm p-3 touch-manipulation sm:p-4 ${SIZE_CLASS[size]}`}
       style={{ backgroundColor: note.color, zIndex: isStraight ? 20 : zBase }}
     >
       <div className="pin-shadow absolute -top-3 left-1/2 -translate-x-1/2">

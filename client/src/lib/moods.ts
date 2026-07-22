@@ -267,7 +267,8 @@ export function rotationForId(id: string): number {
   for (let i = 0; i < id.length; i += 1) {
     hash = (hash * 31 + id.charCodeAt(i)) | 0
   }
-  return ((hash % 11) - 5) * 1.15
+  // Keep tilt subtle so neighbors don't cover each other on a 2-col phone grid.
+  return ((hash % 7) - 3) * 0.7
 }
 
 /** Stable vertical nudge so the board feels pinned, not a uniform card grid. */
@@ -276,16 +277,16 @@ export function pinOffsetForId(id: string): number {
   for (let i = 0; i < id.length; i += 1) {
     hash = (hash * 33 + id.charCodeAt(i)) | 0
   }
-  return (Math.abs(hash) % 9) * 6 - 18
+  return (Math.abs(hash) % 5) * 3 - 6
 }
 
-/** Horizontal drift — slight overlap / stagger between neighbors. */
+/** Horizontal drift — tiny stagger only; large values cause note overlap on mobile. */
 export function pinOffsetXForId(id: string): number {
   let hash = 0
   for (let i = 0; i < id.length; i += 1) {
     hash = (hash * 29 + id.charCodeAt(i)) | 0
   }
-  return ((Math.abs(hash) % 9) - 4) * 5
+  return ((Math.abs(hash) % 5) - 2) * 2
 }
 
 /** Short / medium / tall note heights for irregular corkboard rhythm. */

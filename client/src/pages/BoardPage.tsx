@@ -108,7 +108,7 @@ export function BoardPage() {
                 filters.dateFrom,
                 filters.dateTo,
               ].join('|')}
-              className="grid grid-cols-2 items-start gap-x-1 gap-y-4 sm:grid-cols-3 sm:gap-x-2 sm:gap-y-6 md:grid-cols-4"
+              className="grid grid-cols-2 items-start gap-x-3 gap-y-7 sm:grid-cols-3 sm:gap-x-4 sm:gap-y-8 md:grid-cols-4"
               onPointerDown={(e) => {
                 // Tap empty cork → put notes back at an angle
                 if (e.target === e.currentTarget) setStraightenedId(null)
