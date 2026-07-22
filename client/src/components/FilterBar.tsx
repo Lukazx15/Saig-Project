@@ -120,22 +120,24 @@ export function FilterBar({ filters, onChange, onReset }: FilterBarProps) {
             </select>
           </label>
 
-          <label className="flex flex-col gap-1">
+          <label className="flex min-w-0 flex-col gap-1">
             <span className="text-[11px] font-medium text-ink-soft/80">{t('filterDateFrom')}</span>
             <input
               type="date"
               value={filters.dateFrom}
+              max={filters.dateTo || undefined}
               onChange={(e) => onChange({ dateFrom: e.target.value })}
               aria-label={t('filterDateFrom')}
               className="filter-select"
             />
           </label>
 
-          <label className="flex flex-col gap-1">
+          <label className="flex min-w-0 flex-col gap-1">
             <span className="text-[11px] font-medium text-ink-soft/80">{t('filterDateTo')}</span>
             <input
               type="date"
               value={filters.dateTo}
+              min={filters.dateFrom || undefined}
               onChange={(e) => onChange({ dateTo: e.target.value })}
               aria-label={t('filterDateTo')}
               className="filter-select"

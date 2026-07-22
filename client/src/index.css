@@ -206,6 +206,12 @@
 }
 
 .filter-select {
+  /* Keep native controls (esp. date) in light scheme — page html is dark,
+     which otherwise hides calendar glyphs / washes out date text on paper. */
+  color-scheme: light;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
   border-radius: 2px;
   border: 1px solid rgba(36, 26, 18, 0.16);
   background: #fffef9;
@@ -218,6 +224,12 @@
   border-color: var(--color-cork-700);
   outline: none;
   box-shadow: 0 0 0 2px rgba(138, 92, 52, 0.18);
+}
+
+/* Ensure the native calendar affordance stays clickable on narrow grid cells */
+.filter-select[type='date'] {
+  min-height: 2.25rem;
+  line-height: 1.25;
 }
 
 @keyframes brand-loader-pin {
