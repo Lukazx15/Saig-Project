@@ -79,7 +79,7 @@ export const th: Messages = {
   boardSubtitle: 'โน้ตอารมณ์ไม่ระบุชื่อจากเพื่อนขี้เสือกใน KMITL',
   boardLoading: 'กำลังดึงกระดาน…',
   boardEmpty: 'ยังไม่มีโน้ตตามตัวกรองนี้ เป็นคนแรกที่ปักเลยไหม',
-  boardPinCta: 'ปักอารมณ์',
+  boardPinCta: 'แปะโน้ต',
   boardDeleteConfirm: 'ถอดหมุดแล้วลบโน้ตนี้เลยไหม',
   boardDeleteFailed: 'ลบโน้ตไม่สำเร็จ',
   boardEditTitle: 'แก้โน้ตของคุณ',
@@ -103,11 +103,11 @@ export const th: Messages = {
   moodExcited: 'ตื่นเต้น',
   moodAngry: 'โมโห',
 
-  composeTitle: 'ปักอารมณ์ของคุณ',
+  composeTitle: 'แปะโน้ตอารมณ์ของคุณ',
   composeFeeling: 'ตอนนี้มู้ดไหน',
   composePlaceholder: 'เล่าสั้นๆ ว่าคิดอะไรอยู่…',
   composeCancel: 'ยกเลิก',
-  composePin: 'ปักเลย',
+  composePin: 'แปะเลย',
   composePinning: 'กำลังปัก…',
   composeFailed: 'มีอะไรผิดพลาด ลองใหม่นะ',
 
