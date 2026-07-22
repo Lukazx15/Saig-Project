@@ -50,9 +50,12 @@ export const en: Messages = {
   resetBackToLogin: 'Back to sign in',
 
   registerTitle: 'Join the board',
-  registerSubtitle: 'KMITL students only — 8-digit student ID and @kmitl.ac.th email required. Your identity stays anonymous on the board.',
+  registerSubtitle:
+    'Verify with your KMITL account first. After that you will set a password so you can also sign in with student ID later.',
   registerSubtitleSso: 'Your KMITL identity is verified — just finish setting up your profile.',
   registerSsoBanner: 'KMITL SSO verified — student ID and email are locked to your account.',
+  registerContinueKmitl: 'Continue with KMITL',
+  registerLoading: 'Checking your KMITL session…',
   registerEmail: 'KMITL Email',
   registerFaculty: 'Faculty',
   registerYear: 'Year',

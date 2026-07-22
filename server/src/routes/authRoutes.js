@@ -15,7 +15,7 @@ const router = express.Router();
  * @openapi
  * /api/auth/register:
  *   post:
- *     summary: Register a new student account
+ *     summary: Register a new student account (requires KMITL SSO ticket cookie)
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -35,7 +35,7 @@ const router = express.Router();
  *       201:
  *         description: Account created, session started
  *       400:
- *         description: Validation or KMITL verification failure
+ *         description: Missing/invalid SSO ticket, identity mismatch, or validation failure
  *       409:
  *         description: Account already exists
  */

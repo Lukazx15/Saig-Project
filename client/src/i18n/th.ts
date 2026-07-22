@@ -53,9 +53,12 @@ export const th: Messages = {
   resetBackToLogin: 'กลับไปเข้าสู่ระบบ',
 
   registerTitle: 'มาอยู่บนกระดานกัน',
-  registerSubtitle: 'เฉพาะนักศึกษา KMITL — ต้องมีรหัสนักศึกษา 8 หลักและอีเมล @kmitl.ac.th โพสต์แบบไม่โชว์ชื่อจริง',
+  registerSubtitle:
+    'ยืนยันตัวตนด้วยบัญชี KMITL ก่อน จากนั้นตั้งรหัสผ่านไว้เข้าสู่ระบบด้วยรหัสนักศึกษาได้ภายหลัง',
   registerSubtitleSso: 'ยืนยันตัวตนกับ KMITL แล้ว เหลือแค่เติมโปรไฟล์ให้ครบ',
   registerSsoBanner: 'ผ่าน KMITL SSO แล้ว รหัสนักศึกษาและอีเมลจะผูกกับบัญชีนี้',
+  registerContinueKmitl: 'ดำเนินการต่อด้วย KMITL',
+  registerLoading: 'กำลังตรวจสอบเซสชัน KMITL…',
   registerEmail: 'อีเมล KMITL',
   registerFaculty: 'คณะ',
   registerYear: 'ชั้นปี',

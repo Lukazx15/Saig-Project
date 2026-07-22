@@ -49,6 +49,8 @@ export type MessageKey =
   | 'registerSubtitle'
   | 'registerSubtitleSso'
   | 'registerSsoBanner'
+  | 'registerContinueKmitl'
+  | 'registerLoading'
   | 'registerEmail'
   | 'registerFaculty'
   | 'registerYear'

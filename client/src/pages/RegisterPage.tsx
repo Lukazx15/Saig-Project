@@ -7,7 +7,7 @@ import { AuthCard } from '@/components/AuthCard'
 import { PasswordInput } from '@/components/PasswordInput'
 import { useAuth } from '@/context/AuthContext'
 import { useLocale } from '@/context/LocaleContext'
-import { fetchSsoPrefill, type SsoPrefill } from '@/api/auth'
+import { fetchSsoPrefill, loginWithKmitl, type SsoPrefill } from '@/api/auth'
 import { registerSchema, type RegisterFormValues } from '@/lib/schemas'
 import { KMITL_FACULTIES, majorsForFaculty } from '@/lib/moods'
 
@@ -65,11 +65,47 @@ export function RegisterPage() {
     }
   }
 
+  if (ssoLoading) {
+    return (
+      <Layout variant="auth">
+        <AuthCard title={t('registerTitle')} subtitle={t('registerLoading')}>
+          <p className="text-center text-sm text-ink-soft">{t('registerLoading')}</p>
+        </AuthCard>
+      </Layout>
+    )
+  }
+
+  if (!ssoIdentity) {
+    return (
+      <Layout variant="auth">
+        <AuthCard
+          title={t('registerTitle')}
+          subtitle={t('registerSubtitle')}
+          footer={
+            <>
+              {t('registerAlready')}{' '}
+              <Link
+                to="/login"
+                className="font-semibold text-cork-800 underline-offset-2 transition-colors hover:text-cork-700 hover:underline"
+              >
+                {t('registerSignIn')}
+              </Link>
+            </>
+          }
+        >
+          <button type="button" onClick={loginWithKmitl} className="auth-btn-primary">
+            {t('registerContinueKmitl')}
+          </button>
+        </AuthCard>
+      </Layout>
+    )
+  }
+
   return (
     <Layout variant="auth">
       <AuthCard
         title={t('registerTitle')}
-        subtitle={ssoIdentity ? t('registerSubtitleSso') : t('registerSubtitle')}
+        subtitle={t('registerSubtitleSso')}
         footer={
           <>
             {t('registerAlready')}{' '}
@@ -83,11 +119,9 @@ export function RegisterPage() {
         }
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          {ssoIdentity && (
-            <p className="rounded-sm border border-brass-500/35 bg-brass-400/15 px-3 py-2 text-xs text-ink-soft">
-              {t('registerSsoBanner')}
-            </p>
-          )}
+          <p className="rounded-sm border border-brass-500/35 bg-brass-400/15 px-3 py-2 text-xs text-ink-soft">
+            {t('registerSsoBanner')}
+          </p>
 
           <div>
             <label className="auth-label" htmlFor="register-student-id">
@@ -99,8 +133,7 @@ export function RegisterPage() {
               type="text"
               inputMode="numeric"
               placeholder="65010001"
-              readOnly={Boolean(ssoIdentity)}
-              disabled={ssoLoading}
+              readOnly
               autoComplete="username"
               className="auth-input"
             />
@@ -118,8 +151,7 @@ export function RegisterPage() {
               id="register-email"
               type="email"
               placeholder="65010001@kmitl.ac.th"
-              readOnly={Boolean(ssoIdentity)}
-              disabled={ssoLoading}
+              readOnly
               autoComplete="email"
               className="auth-input"
             />
@@ -255,7 +287,7 @@ export function RegisterPage() {
             </p>
           )}
 
-          <button type="submit" disabled={isSubmitting || ssoLoading} className="auth-btn-primary">
+          <button type="submit" disabled={isSubmitting} className="auth-btn-primary">
             {isSubmitting ? t('registerSubmitting') : t('registerSubmit')}
           </button>
         </form>

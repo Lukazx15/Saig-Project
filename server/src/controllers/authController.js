@@ -4,7 +4,6 @@ const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const env = require('../config/env');
 const { generateAlias } = require('../services/aliasService');
-const { verifyStudent } = require('../services/kmitlVerify');
 const kmitlOidc = require('../services/kmitlOidc');
 const { normalizeFacultyMajor } = require('../config/kmitlCatalog');
 const {
@@ -42,42 +41,43 @@ async function issueSession(res, user) {
 
 /**
  * POST /api/auth/register
+ * Registration is SSO-only: a valid httpOnly ssoTicket cookie (from the
+ * KMITL OIDC callback) is required. Non-SSO / verifyStudent signups are rejected.
  */
 const register = asyncHandler(async (req, res) => {
   const { studentId, email, faculty, major, year, password } = req.body;
   const normalizedEmail = String(email).toLowerCase().trim();
   const ssoTicket = req.cookies?.[SSO_TICKET_COOKIE];
 
+  if (!ssoTicket) {
+    throw ApiError.badRequest(
+      'KMITL SSO is required to register. Please continue with KMITL first.',
+    );
+  }
+
   const existing = await User.findOne({ $or: [{ studentId }, { email: normalizedEmail }] });
   if (existing) {
     throw ApiError.conflict('An account with this studentId or email already exists');
   }
 
-  // An SSO ticket cookie proves the student already authenticated with the
-  // real KMITL identity provider — trust it over the format/API check, but
-  // only if the submitted identity matches what SSO attested.
-  let verification;
-  if (ssoTicket) {
-    let attested;
-    try {
-      attested = kmitlOidc.verifySsoTicket(ssoTicket);
-    } catch {
-      res.clearCookie(SSO_TICKET_COOKIE, clearSsoTicketCookieOptions());
-      throw ApiError.badRequest('KMITL SSO ticket is invalid or expired, please sign in with KMITL again');
-    }
-    if (attested.studentId !== studentId || attested.email !== normalizedEmail) {
-      throw ApiError.badRequest('Submitted identity does not match the KMITL SSO login');
-    }
-    if (attested.year != null && Number(year) !== attested.year) {
-      throw ApiError.badRequest('Submitted year of study does not match the KMITL SSO login');
-    }
-    verification = { verified: true, method: 'sso' };
-  } else {
-    verification = await verifyStudent({ studentId, email: normalizedEmail, year });
-    if (!verification.verified) {
-      throw ApiError.badRequest('KMITL student verification failed', { reason: verification.reason });
-    }
+  // Ticket proves the student authenticated with KMITL; submitted identity
+  // must still match what SSO attested.
+  let attested;
+  try {
+    attested = kmitlOidc.verifySsoTicket(ssoTicket);
+  } catch {
+    res.clearCookie(SSO_TICKET_COOKIE, clearSsoTicketCookieOptions());
+    throw ApiError.badRequest(
+      'KMITL SSO ticket is invalid or expired, please sign in with KMITL again',
+    );
   }
+  if (attested.studentId !== studentId || attested.email !== normalizedEmail) {
+    throw ApiError.badRequest('Submitted identity does not match the KMITL SSO login');
+  }
+  if (attested.year != null && Number(year) !== attested.year) {
+    throw ApiError.badRequest('Submitted year of study does not match the KMITL SSO login');
+  }
+  const verification = { verified: true, method: 'sso' };
 
   let canonical;
   try {
