@@ -2,6 +2,7 @@ const Mood = require('../models/Mood');
 const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
+const { parseDateFrom, parseDateTo } = require('../utils/dateRange');
 
 /**
  * POST /api/moods
@@ -43,8 +44,9 @@ const listMoods = asyncHandler(async (req, res) => {
   if (major) filter.authorMajor = major;
   if (dateFrom || dateTo) {
     filter.createdAt = {};
-    if (dateFrom) filter.createdAt.$gte = new Date(dateFrom);
-    if (dateTo) filter.createdAt.$lte = new Date(dateTo);
+    // date-only (YYYY-MM-DD) → full Bangkok calendar day; see dateRange.js
+    if (dateFrom) filter.createdAt.$gte = parseDateFrom(dateFrom);
+    if (dateTo) filter.createdAt.$lte = parseDateTo(dateTo);
   }
 
   const [items, total] = await Promise.all([
