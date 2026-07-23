@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { MOOD_TYPES, MOOD_COLORS, MOOD_EMOJIS } = require('../config/constants');
+const { MOOD_TYPES, MOOD_COLORS } = require('../config/constants');
 
 const { Schema } = mongoose;
 
@@ -59,7 +59,6 @@ moodSchema.methods.toPublicJSON = function toPublicJSON(viewer) {
   return {
     id: this._id,
     moodType: this.moodType,
-    emoji: MOOD_EMOJIS[this.moodType],
     message: this.message,
     color: MOOD_COLORS[this.moodType],
     alias: this.authorAlias,
