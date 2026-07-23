@@ -56,7 +56,21 @@ if (env.nodeEnv !== 'test') {
 }
 
 if (env.nodeEnv !== 'production') {
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec, {
+      explorer: true,
+      customSiteTitle: 'Mood of the Major API',
+      swaggerOptions: {
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        docExpansion: 'list',
+        filter: true,
+        tryItOutEnabled: true,
+      },
+    })
+  );
   app.get('/api-docs.json', (_req, res) => res.json(swaggerSpec));
 }
 

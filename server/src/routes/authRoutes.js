@@ -12,28 +12,41 @@ const router = express.Router();
  * @openapi
  * /api/auth/register:
  *   post:
- *     summary: Register a new student account (requires KMITL SSO ticket cookie; no password)
+ *     summary: Register a new student account (SSO ticket cookie required; no password)
+ *     description: Requires httpOnly cookie `ssoTicket` from KMITL SSO callback, plus same-origin Origin header.
  *     tags: [Auth]
+ *     parameters:
+ *       - $ref: '#/components/parameters/OriginHeader'
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [studentId, email, faculty, major, year]
- *             properties:
- *               studentId: { type: string, example: "65010001" }
- *               email: { type: string, example: "65010001@kmitl.ac.th" }
- *               faculty: { type: string, example: "Engineering" }
- *               major: { type: string, example: "Computer Engineering" }
- *               year: { type: integer, example: 2 }
+ *             $ref: '#/components/schemas/RegisterRequest'
  *     responses:
  *       201:
- *         description: Account created, session started
+ *         description: Account created, session started (sets refreshToken cookie)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user: { $ref: '#/components/schemas/UserProfile' }
+ *                     accessToken: { type: string }
  *       400:
  *         description: Missing/invalid SSO ticket, identity mismatch, or validation failure
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  *       409:
  *         description: Account already exists
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  */
 router.post(
   '/register',
@@ -48,13 +61,22 @@ router.post(
  * @openapi
  * /api/auth/refresh:
  *   post:
- *     summary: Rotate the refresh token (httpOnly cookie) and issue a new access token
+ *     summary: Rotate refresh token cookie and issue a new access token
+ *     description: Requires httpOnly cookie `refreshToken` and same-origin Origin header.
  *     tags: [Auth]
+ *     parameters:
+ *       - $ref: '#/components/parameters/OriginHeader'
  *     responses:
  *       200:
- *         description: New access token issued
+ *         description: New access token issued (refresh cookie rotated)
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/AccessTokenResponse' }
  *       401:
  *         description: Missing/invalid/expired refresh token
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  */
 router.post('/refresh', authStrictLimiter, requireSameOrigin, authController.refresh);
 
@@ -62,11 +84,25 @@ router.post('/refresh', authStrictLimiter, requireSameOrigin, authController.ref
  * @openapi
  * /api/auth/logout:
  *   post:
- *     summary: Revoke the current refresh token and clear the cookie
+ *     summary: Revoke refresh token and clear the cookie
+ *     description: Requires same-origin Origin header. May return KMITL logout URL.
  *     tags: [Auth]
+ *     parameters:
+ *       - $ref: '#/components/parameters/OriginHeader'
  *     responses:
  *       200:
  *         description: Logged out
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 message: { type: string, example: "Logged out" }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     kmitlLogoutUrl: { type: string, nullable: true }
  */
 router.post('/logout', requireSameOrigin, authController.logout);
 
@@ -74,13 +110,16 @@ router.post('/logout', requireSameOrigin, authController.logout);
  * @openapi
  * /api/auth/kmitl:
  *   get:
- *     summary: Start KMITL SSO login (redirects to the KMITL OIDC login page)
+ *     summary: Start KMITL SSO login (browser redirect)
  *     tags: [Auth]
  *     responses:
  *       302:
  *         description: Redirect to sso.kmitl.ac.th
  *       400:
  *         description: SSO not configured on this server
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  */
 router.get('/kmitl', authController.kmitlSsoStart);
 
@@ -88,7 +127,7 @@ router.get('/kmitl', authController.kmitlSsoStart);
  * @openapi
  * /api/auth/kmitl/callback:
  *   get:
- *     summary: KMITL SSO redirect target (exchanges code, then redirects to the client)
+ *     summary: KMITL SSO callback (exchanges code, redirects to client)
  *     tags: [Auth]
  *     parameters:
  *       - in: query
@@ -113,8 +152,21 @@ router.get('/kmitl/callback', authController.kmitlSsoCallback);
  *     responses:
  *       200:
  *         description: Current user profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user: { $ref: '#/components/schemas/UserProfile' }
  *       401:
  *         description: Not authenticated
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  */
 router.get('/me', authenticate, authController.me);
 
@@ -123,12 +175,28 @@ router.get('/me', authenticate, authController.me);
  * /api/auth/sso-prefill:
  *   get:
  *     summary: Prefill register form from the httpOnly SSO ticket cookie
+ *     description: Requires cookie `ssoTicket` set after first-time KMITL SSO when no account exists yet.
  *     tags: [Auth]
  *     responses:
  *       200:
  *         description: Attested studentId, email, and optional year
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     studentId: { type: string, example: "65010001" }
+ *                     email: { type: string, example: "65010001@kmitl.ac.th" }
+ *                     year: { type: integer, nullable: true, example: 2 }
  *       400:
  *         description: Missing, invalid, or expired SSO ticket cookie
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  */
 router.get('/sso-prefill', authController.ssoPrefill);
 

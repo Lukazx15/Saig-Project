@@ -13,7 +13,18 @@ const router = express.Router();
  *     summary: Health check
  *     tags: [Health]
  *     responses:
- *       200: { description: Server is up }
+ *       200:
+ *         description: Server is up
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     status: { type: string, example: "ok" }
  */
 router.get('/health', (_req, res) => res.json({ success: true, data: { status: 'ok' } }));
 

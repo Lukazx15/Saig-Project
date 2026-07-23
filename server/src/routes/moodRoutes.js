@@ -23,44 +23,46 @@ const router = express.Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [moodType, message]
- *             properties:
- *               moodType: { type: string, enum: [happy, calm, tired, stressed, sad, excited, angry] }
- *               message: { type: string, maxLength: 280 }
+ *             $ref: '#/components/schemas/CreateMoodRequest'
  *     responses:
- *       201: { description: Mood created }
- *       400: { description: Validation error }
- *       401: { description: Not authenticated }
+ *       201:
+ *         description: Mood created
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/MoodResponse' }
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
+ *       401:
+ *         description: Not authenticated
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  *   get:
  *     summary: List mood notes with filters + pagination
  *     tags: [Moods]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
- *       - in: query
- *         name: moodType
- *         schema: { type: string, enum: [happy, calm, tired, stressed, sad, excited, angry] }
- *       - in: query
- *         name: faculty
- *         schema: { type: string }
- *       - in: query
- *         name: major
- *         schema: { type: string }
- *       - in: query
- *         name: dateFrom
- *         schema: { type: string, format: date }
- *       - in: query
- *         name: dateTo
- *         schema: { type: string, format: date }
- *       - in: query
- *         name: page
- *         schema: { type: integer, default: 1 }
- *       - in: query
- *         name: limit
- *         schema: { type: integer, default: 20 }
+ *       - $ref: '#/components/parameters/MoodTypeQuery'
+ *       - $ref: '#/components/parameters/FacultyQuery'
+ *       - $ref: '#/components/parameters/MajorQuery'
+ *       - $ref: '#/components/parameters/DateFromQuery'
+ *       - $ref: '#/components/parameters/DateToQuery'
+ *       - $ref: '#/components/parameters/PageQuery'
+ *       - $ref: '#/components/parameters/LimitQuery'
  *     responses:
- *       200: { description: Paginated list of moods }
- *       401: { description: Not authenticated }
+ *       200:
+ *         description: Paginated list of moods
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/MoodListResponse' }
+ *       401:
+ *         description: Not authenticated
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  */
 router.post('/', authenticate, createMoodValidator, validate, moodController.createMood);
 router.get('/', authenticate, listMoodsValidator, validate, moodController.listMoods);
@@ -73,48 +75,77 @@ router.get('/', authenticate, listMoodsValidator, validate, moodController.listM
  *     tags: [Moods]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
+ *       - $ref: '#/components/parameters/MoodId'
  *     responses:
- *       200: { description: Mood found }
- *       401: { description: Not authenticated }
- *       404: { description: Mood not found }
+ *       200:
+ *         description: Mood found
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/MoodResponse' }
+ *       401:
+ *         description: Not authenticated
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
+ *       404:
+ *         description: Mood not found
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  *   patch:
  *     summary: Update a mood note (owner only)
  *     tags: [Moods]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
+ *       - $ref: '#/components/parameters/MoodId'
  *     requestBody:
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               moodType: { type: string, enum: [happy, calm, tired, stressed, sad, excited, angry] }
- *               message: { type: string, maxLength: 280 }
+ *             $ref: '#/components/schemas/UpdateMoodRequest'
  *     responses:
- *       200: { description: Mood updated }
- *       403: { description: Not the owner }
- *       404: { description: Mood not found }
+ *       200:
+ *         description: Mood updated
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/MoodResponse' }
+ *       403:
+ *         description: Not the owner
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
+ *       404:
+ *         description: Mood not found
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  *   delete:
  *     summary: Delete a mood note (owner or admin)
  *     tags: [Moods]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
+ *       - $ref: '#/components/parameters/MoodId'
  *     responses:
- *       200: { description: Mood deleted }
- *       403: { description: Not the owner or admin }
- *       404: { description: Mood not found }
+ *       200:
+ *         description: Mood deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data: { nullable: true, example: null }
+ *                 message: { type: string, example: "Mood deleted" }
+ *       403:
+ *         description: Not the owner or admin
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
+ *       404:
+ *         description: Mood not found
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  */
 router.get('/:id', authenticate, moodIdValidator, validate, moodController.getMood);
 router.patch('/:id', authenticate, updateMoodValidator, validate, moodController.updateMood);
