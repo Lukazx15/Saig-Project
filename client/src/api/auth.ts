@@ -1,7 +1,7 @@
 import { api, API_BASE_URL, setAccessToken } from './client'
 import { getErrorMessage, normalizeAuthResponse, normalizeUser } from './normalize'
 import type { AuthResponse, User } from '@/types'
-import type { LoginFormValues, RegisterFormValues } from '@/lib/schemas'
+import type { RegisterFormValues } from '@/lib/schemas'
 
 async function applyAuth(raw: unknown): Promise<AuthResponse> {
   const auth = normalizeAuthResponse(raw)
@@ -9,9 +9,7 @@ async function applyAuth(raw: unknown): Promise<AuthResponse> {
   return auth
 }
 
-export async function register(
-  values: Omit<RegisterFormValues, 'confirmPassword'>,
-): Promise<AuthResponse> {
+export async function register(values: RegisterFormValues): Promise<AuthResponse> {
   try {
     const { data } = await api.post('/auth/register', {
       studentId: values.studentId,
@@ -19,7 +17,6 @@ export async function register(
       faculty: values.faculty,
       major: values.major,
       year: values.year,
-      password: values.password,
     })
     return applyAuth(data)
   } catch (err) {
@@ -56,18 +53,6 @@ export async function fetchSsoPrefill(): Promise<SsoPrefill | null> {
     return null
   } catch {
     return null
-  }
-}
-
-export async function login(values: LoginFormValues): Promise<AuthResponse> {
-  try {
-    const { data } = await api.post('/auth/login', {
-      studentId: values.studentId,
-      password: values.password,
-    })
-    return applyAuth(data)
-  } catch (err) {
-    throw new Error(getErrorMessage(err, 'Login failed'))
   }
 }
 

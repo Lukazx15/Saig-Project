@@ -20,11 +20,6 @@ const userSchema = new Schema(
       trim: true,
       index: true,
     },
-    passwordHash: {
-      type: String,
-      required: true,
-      select: false,
-    },
     faculty: {
       type: String,
       required: true,

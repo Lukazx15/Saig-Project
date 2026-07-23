@@ -14,7 +14,7 @@ import { NotFoundPage } from '@/pages/NotFoundPage'
  * Routing model:
  * - Board is public (browse + filters); pin/compose requires login
  * - Stats + admin require a verified session (admin for moderation)
- * - Login / register are guest-only (password reset disabled; use KMITL SSO)
+ * - Login / register are guest-only (KMITL SSO only; no local passwords)
  *
  * LocaleProvider lives in main.tsx so Fast Refresh of App routes
  * does not drop the locale context under BoardPage / auth pages.

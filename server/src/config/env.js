@@ -34,7 +34,6 @@ const env = {
   admin: {
     studentId: process.env.ADMIN_STUDENT_ID,
     email: process.env.ADMIN_EMAIL,
-    password: process.env.ADMIN_PASSWORD,
     faculty: process.env.ADMIN_FACULTY || 'Administration',
     major: process.env.ADMIN_MAJOR || 'Administration',
     year: parseInt(process.env.ADMIN_YEAR, 10) || 4,

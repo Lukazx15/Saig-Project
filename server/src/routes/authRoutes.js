@@ -4,7 +4,7 @@ const authenticate = require('../middleware/authenticate');
 const requireSameOrigin = require('../middleware/requireSameOrigin');
 const { authStrictLimiter } = require('../middleware/rateLimit');
 const validate = require('../validators/validate');
-const { registerValidator, loginValidator } = require('../validators/authValidators');
+const { registerValidator } = require('../validators/authValidators');
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ const router = express.Router();
  * @openapi
  * /api/auth/register:
  *   post:
- *     summary: Register a new student account (requires KMITL SSO ticket cookie)
+ *     summary: Register a new student account (requires KMITL SSO ticket cookie; no password)
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -20,14 +20,13 @@ const router = express.Router();
  *         application/json:
  *           schema:
  *             type: object
- *             required: [studentId, email, faculty, major, year, password]
+ *             required: [studentId, email, faculty, major, year]
  *             properties:
  *               studentId: { type: string, example: "65010001" }
  *               email: { type: string, example: "65010001@kmitl.ac.th" }
  *               faculty: { type: string, example: "Engineering" }
  *               major: { type: string, example: "Computer Engineering" }
  *               year: { type: integer, example: 2 }
- *               password: { type: string, example: "SuperSecret123!" }
  *     responses:
  *       201:
  *         description: Account created, session started
@@ -43,37 +42,6 @@ router.post(
   registerValidator,
   validate,
   authController.register
-);
-
-/**
- * @openapi
- * /api/auth/login:
- *   post:
- *     summary: Log in with studentId + password
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [studentId, password]
- *             properties:
- *               studentId: { type: string, example: "65010001" }
- *               password: { type: string, example: "SuperSecret123!" }
- *     responses:
- *       200:
- *         description: Login successful
- *       401:
- *         description: Invalid credentials
- */
-router.post(
-  '/login',
-  authStrictLimiter,
-  requireSameOrigin,
-  loginValidator,
-  validate,
-  authController.login
 );
 
 /**

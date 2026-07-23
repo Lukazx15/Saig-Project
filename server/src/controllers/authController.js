@@ -1,4 +1,3 @@
-const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
@@ -21,8 +20,6 @@ const {
 } = require('../services/tokenService');
 const securityLog = require('../utils/securityLog');
 
-const BCRYPT_ROUNDS = 12;
-
 async function issueSession(res, user) {
   const accessToken = signAccessToken(user);
   const refreshToken = signRefreshToken(user);
@@ -38,10 +35,10 @@ async function issueSession(res, user) {
 /**
  * POST /api/auth/register
  * Registration is SSO-only: a valid httpOnly ssoTicket cookie (from the
- * KMITL OIDC callback) is required. Non-SSO / verifyStudent signups are rejected.
+ * KMITL OIDC callback) is required. No password is collected or stored.
  */
 const register = asyncHandler(async (req, res) => {
-  const { studentId, email, faculty, major, year, password } = req.body;
+  const { studentId, email, faculty, major, year } = req.body;
   const normalizedEmail = String(email).toLowerCase().trim();
   const ssoTicket = req.cookies?.[SSO_TICKET_COOKIE];
 
@@ -73,7 +70,6 @@ const register = asyncHandler(async (req, res) => {
   if (attested.year != null && Number(year) !== attested.year) {
     throw ApiError.badRequest('Submitted year of study does not match the KMITL SSO login');
   }
-  const verification = { verified: true, method: 'sso' };
 
   let canonical;
   try {
@@ -86,59 +82,27 @@ const register = asyncHandler(async (req, res) => {
     });
   }
 
-  const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
-
   const user = await User.create({
     studentId,
     email: normalizedEmail,
-    passwordHash,
     faculty: canonical.faculty,
     major: canonical.major,
     year,
     alias: generateAlias(),
     kmitlVerified: true,
-    verificationMethod: verification.method,
+    verificationMethod: 'sso',
   });
 
   res.clearCookie(SSO_TICKET_COOKIE, clearSsoTicketCookieOptions());
   const accessToken = await issueSession(res, user);
+  securityLog('auth_success', {
+    userId: user._id.toString(),
+    studentId,
+    method: 'register_sso',
+    ip: req.ip,
+  });
 
   res.status(201).json({
-    success: true,
-    data: {
-      user: user.toPublicProfile(),
-      accessToken,
-    },
-  });
-});
-
-/**
- * POST /api/auth/login
- */
-const login = asyncHandler(async (req, res) => {
-  const { studentId, password } = req.body;
-
-  const user = await User.findOne({ studentId }).select('+passwordHash');
-  if (!user) {
-    securityLog('auth_failure', { reason: 'unknown_user', studentId, ip: req.ip });
-    throw ApiError.unauthorized('Invalid student ID or password');
-  }
-
-  const passwordOk = await bcrypt.compare(password, user.passwordHash);
-  if (!passwordOk) {
-    securityLog('auth_failure', { reason: 'bad_password', studentId, ip: req.ip });
-    throw ApiError.unauthorized('Invalid student ID or password');
-  }
-
-  if (!user.kmitlVerified) {
-    securityLog('auth_failure', { reason: 'unverified', studentId, ip: req.ip });
-    throw ApiError.forbidden('Only verified KMITL students can sign in');
-  }
-
-  const accessToken = await issueSession(res, user);
-  securityLog('auth_success', { userId: user._id.toString(), studentId, ip: req.ip });
-
-  res.json({
     success: true,
     data: {
       user: user.toPublicProfile(),
@@ -279,10 +243,12 @@ const kmitlSsoCallback = asyncHandler(async (req, res) => {
   } catch (err) {
     // eslint-disable-next-line no-console
     console.warn('[kmitlSso] OIDC exchange failed:', err.message);
+    securityLog('auth_failure', { reason: 'oidc_exchange', ip: req.ip });
     return fail('Could not verify your KMITL login, please try again');
   }
 
   if (!identity.studentId) {
+    securityLog('auth_failure', { reason: 'not_student', ip: req.ip });
     return fail('This KMITL account is not a student account');
   }
 
@@ -310,6 +276,12 @@ const kmitlSsoCallback = asyncHandler(async (req, res) => {
     }
 
     await issueSession(res, user);
+    securityLog('auth_success', {
+      userId: user._id.toString(),
+      studentId: user.studentId,
+      method: 'sso',
+      ip: req.ip,
+    });
     return res.redirect(`${clientUrl}/?sso=success`);
   }
 
@@ -352,7 +324,6 @@ const ssoPrefill = asyncHandler(async (req, res) => {
 
 module.exports = {
   register,
-  login,
   refresh,
   logout,
   me,

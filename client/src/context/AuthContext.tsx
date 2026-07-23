@@ -10,14 +10,13 @@ import {
 import * as authApi from '@/api/auth'
 import { registerUnauthorizedHandler } from '@/api/client'
 import type { User } from '@/types'
-import type { LoginFormValues, RegisterFormValues } from '@/lib/schemas'
+import type { RegisterFormValues } from '@/lib/schemas'
 
 interface AuthContextValue {
   user: User | null
   isAuthenticated: boolean
   isAdmin: boolean
   isBootstrapping: boolean
-  login: (values: LoginFormValues) => Promise<void>
   register: (values: RegisterFormValues) => Promise<void>
   logout: () => Promise<void>
 }
@@ -45,14 +44,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const login = useCallback(async (values: LoginFormValues) => {
-    const { user: loggedInUser } = await authApi.login(values)
-    setUser(loggedInUser)
-  }, [])
-
   const register = useCallback(async (values: RegisterFormValues) => {
-    const { confirmPassword: _confirmPassword, ...rest } = values
-    const { user: newUser } = await authApi.register(rest)
+    const { user: newUser } = await authApi.register(values)
     setUser(newUser)
   }, [])
 
@@ -67,11 +60,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: Boolean(user),
       isAdmin: user?.role === 'admin',
       isBootstrapping,
-      login,
       register,
       logout,
     }),
-    [user, isBootstrapping, login, register, logout],
+    [user, isBootstrapping, register, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

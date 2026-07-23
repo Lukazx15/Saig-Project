@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { Layout } from '@/components/Layout'
 import { AuthCard } from '@/components/AuthCard'
-import { PasswordInput } from '@/components/PasswordInput'
 import { useAuth } from '@/context/AuthContext'
 import { useLocale } from '@/context/LocaleContext'
 import { fetchSsoPrefill, loginWithKmitl, type SsoPrefill } from '@/api/auth'
@@ -248,37 +247,6 @@ export function RegisterPage() {
               ))}
             </select>
             {errors.major && <p className="mt-1 text-xs text-red-700">{errors.major.message}</p>}
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label className="auth-label" htmlFor="register-password">
-                {t('registerPassword')}
-              </label>
-              <PasswordInput
-                {...register('password')}
-                id="register-password"
-                placeholder="••••••••"
-                autoComplete="new-password"
-              />
-              {errors.password && (
-                <p className="mt-1 text-xs text-red-700">{errors.password.message}</p>
-              )}
-            </div>
-            <div>
-              <label className="auth-label" htmlFor="register-confirm">
-                {t('registerConfirm')}
-              </label>
-              <PasswordInput
-                {...register('confirmPassword')}
-                id="register-confirm"
-                placeholder="••••••••"
-                autoComplete="new-password"
-              />
-              {errors.confirmPassword && (
-                <p className="mt-1 text-xs text-red-700">{errors.confirmPassword.message}</p>
-              )}
-            </div>
           </div>
 
           {submitError && (

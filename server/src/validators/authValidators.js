@@ -1,17 +1,5 @@
 const { body } = require('express-validator');
 
-const strongPassword = body('password')
-  .isLength({ min: 8 })
-  .withMessage('password must be at least 8 characters long')
-  .matches(/[a-z]/)
-  .withMessage('password must include a lowercase letter')
-  .matches(/[A-Z]/)
-  .withMessage('password must include an uppercase letter')
-  .matches(/\d/)
-  .withMessage('password must include a digit')
-  .matches(/[^A-Za-z0-9]/)
-  .withMessage('password must include a symbol');
-
 const registerValidator = [
   body('studentId')
     .trim()
@@ -30,18 +18,8 @@ const registerValidator = [
   body('year')
     .isInt({ min: 1, max: 8 })
     .withMessage('year must be an integer between 1 and 8'),
-  strongPassword,
-];
-
-const loginValidator = [
-  body('studentId')
-    .trim()
-    .matches(/^\d{8}$/)
-    .withMessage('studentId must be exactly 8 digits'),
-  body('password').notEmpty().withMessage('password is required'),
 ];
 
 module.exports = {
   registerValidator,
-  loginValidator,
 };

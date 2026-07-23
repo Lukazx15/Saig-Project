@@ -63,7 +63,6 @@ api.interceptors.response.use(
     const status = error.response?.status
     const url = original?.url ?? ''
     const isAuthRoute =
-      url.includes('/auth/login') ||
       url.includes('/auth/register') ||
       url.includes('/auth/refresh') ||
       url.includes('/auth/logout')

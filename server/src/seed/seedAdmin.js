@@ -1,21 +1,19 @@
 /* eslint-disable no-console */
 // Usage: npm run seed:admin
-// Creates (or updates) an admin account from ADMIN_* env vars in server/.env
-const bcrypt = require('bcryptjs');
+// Creates (or updates) an admin account from ADMIN_* env vars.
+// Auth is KMITL SSO only — no password is stored.
 const mongoose = require('mongoose');
 const env = require('../config/env');
 const connectDB = require('../config/db');
 const User = require('../models/User');
 const { generateAlias } = require('../services/aliasService');
 
-const BCRYPT_ROUNDS = 12;
-
 async function seedAdmin() {
-  const { studentId, email, password, faculty, major, year } = env.admin;
+  const { studentId, email, faculty, major, year } = env.admin;
 
-  if (!studentId || !email || !password) {
+  if (!studentId || !email) {
     console.error(
-      '[seedAdmin] Missing ADMIN_STUDENT_ID / ADMIN_EMAIL / ADMIN_PASSWORD in server/.env — aborting.'
+      '[seedAdmin] Missing ADMIN_STUDENT_ID / ADMIN_EMAIL in .env — aborting.'
     );
     process.exitCode = 1;
     return;
@@ -23,7 +21,6 @@ async function seedAdmin() {
 
   await connectDB();
 
-  const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
   const normalizedEmail = email.toLowerCase();
 
   const admin = await User.findOneAndUpdate(
@@ -32,24 +29,33 @@ async function seedAdmin() {
       $set: {
         studentId,
         email: normalizedEmail,
-        passwordHash,
         faculty,
         major,
         year,
         role: 'admin',
         kmitlVerified: true,
-        verificationMethod: 'format',
+        verificationMethod: 'sso',
       },
+      $unset: { passwordHash: 1 },
       $setOnInsert: { alias: generateAlias() },
     },
     { upsert: true, new: true }
+  );
+
+  // Drop legacy password hashes from any remaining users.
+  const stripped = await User.updateMany(
+    { passwordHash: { $exists: true } },
+    { $unset: { passwordHash: 1 } }
   );
 
   console.log('[seedAdmin] Admin user ready:');
   console.log(`  studentId: ${admin.studentId}`);
   console.log(`  email:     ${admin.email}`);
   console.log(`  role:      ${admin.role}`);
-  console.log('  password:  (as set in server/.env ADMIN_PASSWORD)');
+  console.log('  auth:      KMITL SSO only (no password)');
+  if (stripped.modifiedCount > 0) {
+    console.log(`  stripped passwordHash from ${stripped.modifiedCount} user(s)`);
+  }
 
   await mongoose.disconnect();
 }
