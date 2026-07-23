@@ -1,6 +1,8 @@
 # Mood of the Major
 
-Anonymous mood-sharing corkboard for **KMITL** students. Sign in with your student identity, pin a short post-it with how you feel, and browse the campus board — without exposing anyone’s real name or student ID.
+Anonymous mood-sharing corkboard for **KMITL** students. Sign in with KMITL SSO, pin a short post-it with how you feel, and browse the campus board — without exposing anyone’s real name or student ID.
+
+**Live app:** [saig-project.vercel.app](https://saig-project.vercel.app)
 
 Public notes show only an **alias**, **faculty**, **major**, and **year**.
 
@@ -10,7 +12,8 @@ Public notes show only an **alias**, **faculty**, **major**, and **year**.
 
 - **Corkboard feed** — color-coded mood notes (happy, calm, tired, stressed, sad, excited, angry) with filter, search, and pagination
 - **Anonymous by design** — real identity stays on the server; the API never returns student ID, name, or email on moods
-- **KMITL auth** — register/login with student ID + `@kmitl.ac.th` email; optional **KMITL SSO** (OIDC)
+- **KMITL SSO registration** — new accounts must continue with KMITL OIDC first; the register form is prefilled from SSO, then you choose faculty/major and set a local password
+- **Password or SSO login** — existing users can sign in with student ID + password or KMITL SSO
 - **Campus Vibe** — mood distribution and faculty breakdown (`/stats`)
 - **Admin moderation** — remove inappropriate notes (`/admin`)
 - **API docs** — Swagger UI at `/api-docs`
@@ -24,7 +27,7 @@ Public notes show only an **alias**, **faculty**, **major**, and **year**.
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS 4, Framer Motion |
 | Backend | Express 4, Mongoose 8 (CommonJS) |
 | Database | MongoDB 7 (Docker Compose locally) |
-| Deploy (optional) | Render (API) + Vercel (client) — see [DEPLOY.md](./DEPLOY.md) |
+| Production | [Vercel](https://saig-project.vercel.app) (client) + Render (API) + MongoDB Atlas — see [DEPLOY.md](./DEPLOY.md) |
 
 ---
 
@@ -44,6 +47,7 @@ Public notes show only an **alias**, **faculty**, **major**, and **year**.
 
 - **Node.js 20+**
 - **Docker** (recommended for MongoDB), or any MongoDB URI (Atlas, local install, etc.)
+- **KMITL SSO credentials** (required for registration) — [developer.kmitl.ac.th](https://developer.kmitl.ac.th/console/sso)
 
 ---
 
@@ -73,6 +77,7 @@ npm run dev:client   # http://localhost:5173
 | Client | http://localhost:5173 |
 | API | http://localhost:4000 |
 | Swagger | http://localhost:4000/api-docs |
+| Production | https://saig-project.vercel.app |
 
 Default MongoDB URI: `mongodb://127.0.0.1:27017/mood-of-the-major`
 
@@ -89,8 +94,7 @@ Default MongoDB URI: `mongodb://127.0.0.1:27017/mood-of-the-major`
 | `CLIENT_URL` | Frontend origin (CORS + cookies), e.g. `http://localhost:5173` |
 | `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | JWT signing secrets |
 | `ADMIN_*` | Values used by `npm run seed:admin` |
-| `KMITL_OIDC_CLIENT_ID` / `SECRET` | Optional — enable “Sign in with KMITL” |
-| `KMITL_API_KEY` | Optional — live KMITL profile API (otherwise format-check fallback) |
+| `KMITL_OIDC_CLIENT_ID` / `SECRET` / `REDIRECT_URI` | Required for registration — KMITL SSO (OIDC) |
 
 ### Client (`client/.env`)
 
@@ -100,11 +104,12 @@ VITE_API_URL=http://localhost:4000
 
 ---
 
-## Auth & privacy (short)
+## Auth & privacy
 
-- **Access token** (15m) in the response body — kept in memory on the client, not `localStorage`
-- **Refresh token** (7d) in an httpOnly cookie under `/api/auth`; rotated on refresh
-- Mood responses go through `Mood.toPublicJSON()` — only alias / faculty / major / year (plus viewer flags like `isOwner`)
+1. **Register** — Continue with KMITL SSO → identity ticket → complete faculty, major, and password on `/register`
+2. **Login** — student ID + password, or Sign in with KMITL
+3. **Tokens** — access JWT (~15m) in memory on the client; refresh token (7d) in an httpOnly cookie under `/api/auth`, rotated on refresh
+4. **Moods** — responses use `Mood.toPublicJSON()` (alias / faculty / major / year only, plus viewer flags like `isOwner`)
 
 ---
 
@@ -128,7 +133,8 @@ From `server/`: `npm run seed:admin` creates the local admin user.
 
 Production target is **MongoDB Atlas + Render (API) + Vercel (client)**.
 
-Full steps, env vars, and cookie/CORS notes: **[DEPLOY.md](./DEPLOY.md)**.
+- Live frontend: [https://saig-project.vercel.app](https://saig-project.vercel.app)
+- Full steps, env vars, and cookie/CORS notes: **[DEPLOY.md](./DEPLOY.md)**
 
 ---
 
