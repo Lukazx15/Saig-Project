@@ -12,9 +12,8 @@ import { NotFoundPage } from '@/pages/NotFoundPage'
 
 /**
  * Routing model:
- * - Board is public (browse + filters); pin/compose requires login
- * - Stats + admin require a verified session (admin for moderation)
- * - Login / register are guest-only (KMITL SSO only; no local passwords)
+ * - Board, stats, admin require a verified KMITL student session
+ * - Login / register are guest-only (KMITL SSO)
  *
  * LocaleProvider lives in main.tsx so Fast Refresh of App routes
  * does not drop the locale context under BoardPage / auth pages.
@@ -23,13 +22,14 @@ function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* MoodProvider only on the board — auth/stats/admin must not prefetch moods. */}
         <Route
           path="/"
           element={
-            <MoodProvider>
-              <BoardPage />
-            </MoodProvider>
+            <ProtectedRoute>
+              <MoodProvider>
+                <BoardPage />
+              </MoodProvider>
+            </ProtectedRoute>
           }
         />
         <Route

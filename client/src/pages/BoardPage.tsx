@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Layout } from '@/components/Layout'
 import { FilterBar } from '@/components/FilterBar'
 import { PostIt } from '@/components/PostIt'
@@ -19,10 +19,19 @@ export function BoardPage() {
   const { moods, pagination, filters, isLoading, error, setFilters, resetFilters, setPage, composeMood, editMood, removeMood } =
     useMoods()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [isComposeOpen, setIsComposeOpen] = useState(false)
   const [editingNote, setEditingNote] = useState<MoodNote | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [straightenedId, setStraightenedId] = useState<string | null>(null)
+
+  // SSO callback lands on /?sso=success — strip it so the URL is shareable/clean.
+  useEffect(() => {
+    if (searchParams.get('sso') !== 'success') return
+    const next = new URLSearchParams(searchParams)
+    next.delete('sso')
+    setSearchParams(next, { replace: true })
+  }, [searchParams, setSearchParams])
 
   function handleComposeClick() {
     if (!isAuthenticated) {

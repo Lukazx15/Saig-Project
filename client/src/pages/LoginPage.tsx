@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Layout } from '@/components/Layout'
 import { AuthCard } from '@/components/AuthCard'
@@ -6,8 +7,16 @@ import { loginWithKmitl } from '@/api/auth'
 
 export function LoginPage() {
   const { t } = useLocale()
-  const [searchParams] = useSearchParams()
-  const ssoError = searchParams.get('ssoError')
+  const [searchParams, setSearchParams] = useSearchParams()
+  // Capture once so clearing the query does not hide the error banner.
+  const [ssoError] = useState(() => searchParams.get('ssoError'))
+
+  useEffect(() => {
+    if (!searchParams.has('ssoError')) return
+    const next = new URLSearchParams(searchParams)
+    next.delete('ssoError')
+    setSearchParams(next, { replace: true })
+  }, [searchParams, setSearchParams])
 
   return (
     <Layout variant="auth">

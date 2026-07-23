@@ -60,7 +60,7 @@ function HamburgerIcon({ open }: { open: boolean }) {
 }
 
 export function Navbar() {
-  const { user, isAuthenticated, isAdmin, logout } = useAuth()
+  const { user, isAuthenticated, isAdmin, isBootstrapping, logout } = useAuth()
   const { t } = useLocale()
   const navigate = useNavigate()
   const location = useLocation()
@@ -130,7 +130,12 @@ export function Navbar() {
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <LanguageSwitch />
 
-            {isAuthenticated ? (
+            {isBootstrapping ? (
+              <span
+                className="h-8 w-[4.5rem] rounded-sm bg-white/[0.06] sm:w-[5.5rem]"
+                aria-hidden="true"
+              />
+            ) : isAuthenticated ? (
               <button
                 type="button"
                 onClick={handleLogout}

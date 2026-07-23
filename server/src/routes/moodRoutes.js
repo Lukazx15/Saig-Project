@@ -1,7 +1,6 @@
 const express = require('express');
 const moodController = require('../controllers/moodController');
 const authenticate = require('../middleware/authenticate');
-const optionalAuthenticate = require('../middleware/optionalAuthenticate');
 const validate = require('../validators/validate');
 const {
   createMoodValidator,
@@ -34,9 +33,9 @@ const router = express.Router();
  *       400: { description: Validation error }
  *       401: { description: Not authenticated }
  *   get:
- *     summary: List mood notes with filters + pagination (public; auth personalizes ownership flags)
+ *     summary: List mood notes with filters + pagination
  *     tags: [Moods]
- *     security: []
+ *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: query
  *         name: moodType
@@ -61,17 +60,18 @@ const router = express.Router();
  *         schema: { type: integer, default: 20 }
  *     responses:
  *       200: { description: Paginated list of moods }
+ *       401: { description: Not authenticated }
  */
 router.post('/', authenticate, createMoodValidator, validate, moodController.createMood);
-router.get('/', optionalAuthenticate, listMoodsValidator, validate, moodController.listMoods);
+router.get('/', authenticate, listMoodsValidator, validate, moodController.listMoods);
 
 /**
  * @openapi
  * /api/moods/{id}:
  *   get:
- *     summary: Get a single mood note (public; auth personalizes ownership flags)
+ *     summary: Get a single mood note
  *     tags: [Moods]
- *     security: []
+ *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -79,6 +79,7 @@ router.get('/', optionalAuthenticate, listMoodsValidator, validate, moodControll
  *         schema: { type: string }
  *     responses:
  *       200: { description: Mood found }
+ *       401: { description: Not authenticated }
  *       404: { description: Mood not found }
  *   patch:
  *     summary: Update a mood note (owner only)
@@ -115,7 +116,7 @@ router.get('/', optionalAuthenticate, listMoodsValidator, validate, moodControll
  *       403: { description: Not the owner or admin }
  *       404: { description: Mood not found }
  */
-router.get('/:id', optionalAuthenticate, moodIdValidator, validate, moodController.getMood);
+router.get('/:id', authenticate, moodIdValidator, validate, moodController.getMood);
 router.patch('/:id', authenticate, updateMoodValidator, validate, moodController.updateMood);
 router.delete('/:id', authenticate, moodIdValidator, validate, moodController.deleteMood);
 
