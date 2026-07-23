@@ -6,8 +6,6 @@ import { GuestRoute } from '@/components/GuestRoute'
 import { BoardPage } from '@/pages/BoardPage'
 import { LoginPage } from '@/pages/LoginPage'
 import { RegisterPage } from '@/pages/RegisterPage'
-import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage'
-import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { StatsPage } from '@/pages/StatsPage'
 import { AdminPage } from '@/pages/AdminPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
@@ -16,7 +14,7 @@ import { NotFoundPage } from '@/pages/NotFoundPage'
  * Routing model:
  * - Board is public (browse + filters); pin/compose requires login
  * - Stats + admin require a verified session (admin for moderation)
- * - Login / register / password reset are guest-only
+ * - Login / register are guest-only (password reset disabled; use KMITL SSO)
  *
  * LocaleProvider lives in main.tsx so Fast Refresh of App routes
  * does not drop the locale context under BoardPage / auth pages.
@@ -47,22 +45,6 @@ function App() {
           element={
             <GuestRoute>
               <RegisterPage />
-            </GuestRoute>
-          }
-        />
-        <Route
-          path="/forgot-password"
-          element={
-            <GuestRoute>
-              <ForgotPasswordPage />
-            </GuestRoute>
-          }
-        />
-        <Route
-          path="/reset-password"
-          element={
-            <GuestRoute>
-              <ResetPasswordPage />
             </GuestRoute>
           }
         />

@@ -19,7 +19,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
-        value: mongodb+srv://68010346_db_user:WJtrsI2Gif0CES7a@cluster0.lqnptay.mongodb.net/?appName=Cluster0
+        sync: false
       - key: CLIENT_URL
         value: https://ultra-samood.vercel.app
       - key: JWT_ACCESS_SECRET

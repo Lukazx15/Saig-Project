@@ -31,6 +31,8 @@ Both frontend and API must be **HTTPS**. Refresh cookies use `SameSite=None; Sec
 mongodb+srv://<user>:<password>@<cluster>.mongodb.net/mood-of-the-major?retryWrites=true&w=majority
 ```
 
+Set `MONGODB_URI` only in the Render dashboard (`sync: false` in `render.yaml` — never commit the URI). If a MongoDB password was ever committed to git, **rotate it in Atlas** and update the Render secret.
+
 ---
 
 ## 2. Render (API)

@@ -1,13 +1,10 @@
 const express = require('express');
 const authController = require('../controllers/authController');
 const authenticate = require('../middleware/authenticate');
+const requireSameOrigin = require('../middleware/requireSameOrigin');
+const { authStrictLimiter } = require('../middleware/rateLimit');
 const validate = require('../validators/validate');
-const {
-  registerValidator,
-  loginValidator,
-  forgotPasswordValidator,
-  resetPasswordValidator,
-} = require('../validators/authValidators');
+const { registerValidator, loginValidator } = require('../validators/authValidators');
 
 const router = express.Router();
 
@@ -30,7 +27,7 @@ const router = express.Router();
  *               faculty: { type: string, example: "Engineering" }
  *               major: { type: string, example: "Computer Engineering" }
  *               year: { type: integer, example: 2 }
- *               password: { type: string, example: "SuperSecret123" }
+ *               password: { type: string, example: "SuperSecret123!" }
  *     responses:
  *       201:
  *         description: Account created, session started
@@ -39,7 +36,14 @@ const router = express.Router();
  *       409:
  *         description: Account already exists
  */
-router.post('/register', registerValidator, validate, authController.register);
+router.post(
+  '/register',
+  authStrictLimiter,
+  requireSameOrigin,
+  registerValidator,
+  validate,
+  authController.register
+);
 
 /**
  * @openapi
@@ -56,14 +60,21 @@ router.post('/register', registerValidator, validate, authController.register);
  *             required: [studentId, password]
  *             properties:
  *               studentId: { type: string, example: "65010001" }
- *               password: { type: string, example: "SuperSecret123" }
+ *               password: { type: string, example: "SuperSecret123!" }
  *     responses:
  *       200:
  *         description: Login successful
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', loginValidator, validate, authController.login);
+router.post(
+  '/login',
+  authStrictLimiter,
+  requireSameOrigin,
+  loginValidator,
+  validate,
+  authController.login
+);
 
 /**
  * @openapi
@@ -77,7 +88,7 @@ router.post('/login', loginValidator, validate, authController.login);
  *       401:
  *         description: Missing/invalid/expired refresh token
  */
-router.post('/refresh', authController.refresh);
+router.post('/refresh', authStrictLimiter, requireSameOrigin, authController.refresh);
 
 /**
  * @openapi
@@ -89,7 +100,7 @@ router.post('/refresh', authController.refresh);
  *       200:
  *         description: Logged out
  */
-router.post('/logout', authController.logout);
+router.post('/logout', requireSameOrigin, authController.logout);
 
 /**
  * @openapi
@@ -152,62 +163,5 @@ router.get('/me', authenticate, authController.me);
  *         description: Missing, invalid, or expired SSO ticket cookie
  */
 router.get('/sso-prefill', authController.ssoPrefill);
-
-/**
- * @openapi
- * /api/auth/forgot-password:
- *   post:
- *     summary: Verify studentId + email and set a password-reset cookie
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [studentId, email]
- *             properties:
- *               studentId: { type: string, example: "65010001" }
- *               email: { type: string, example: "65010001@kmitl.ac.th" }
- *     responses:
- *       200:
- *         description: Reset session cookie set (token not returned in body)
- *       400:
- *         description: Identity not found or invalid
- */
-router.post(
-  '/forgot-password',
-  forgotPasswordValidator,
-  validate,
-  authController.forgotPassword
-);
-
-/**
- * @openapi
- * /api/auth/reset-password:
- *   post:
- *     summary: Set a new password using the httpOnly reset cookie
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [password]
- *             properties:
- *               password: { type: string, example: "NewSecret123" }
- *     responses:
- *       200:
- *         description: Password updated
- *       400:
- *         description: Invalid or expired reset session
- */
-router.post(
-  '/reset-password',
-  resetPasswordValidator,
-  validate,
-  authController.resetPassword
-);
 
 module.exports = router;

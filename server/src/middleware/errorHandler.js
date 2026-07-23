@@ -2,12 +2,26 @@ const env = require('../config/env');
 
 // eslint-disable-next-line no-unused-vars
 function errorHandler(err, req, res, _next) {
-  const statusCode = err.isApiError ? err.statusCode : err.name === 'ValidationError' ? 400 : 500;
-  const message = err.isApiError ? err.message : statusCode === 500 ? 'Internal server error' : err.message;
+  const statusCode = err.isApiError
+    ? err.statusCode
+    : err.name === 'ValidationError'
+      ? 400
+      : 500;
 
-  if (statusCode === 500) {
+  let message = err.isApiError
+    ? err.message
+    : statusCode === 500
+      ? 'Internal server error'
+      : err.message;
+
+  // Never echo CORS/origin details to clients in production.
+  if (env.nodeEnv === 'production' && statusCode === 403 && /origin/i.test(message)) {
+    message = 'Origin not allowed';
+  }
+
+  if (statusCode >= 500) {
     // eslint-disable-next-line no-console
-    console.error('[error]', err);
+    console.error('[error]', err.message);
   }
 
   res.status(statusCode).json({

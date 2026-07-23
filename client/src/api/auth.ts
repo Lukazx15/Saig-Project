@@ -1,12 +1,7 @@
 import { api, API_BASE_URL, setAccessToken } from './client'
 import { getErrorMessage, normalizeAuthResponse, normalizeUser } from './normalize'
 import type { AuthResponse, User } from '@/types'
-import type {
-  ForgotPasswordFormValues,
-  LoginFormValues,
-  RegisterFormValues,
-  ResetPasswordFormValues,
-} from '@/lib/schemas'
+import type { LoginFormValues, RegisterFormValues } from '@/lib/schemas'
 
 async function applyAuth(raw: unknown): Promise<AuthResponse> {
   const auth = normalizeAuthResponse(raw)
@@ -73,27 +68,6 @@ export async function login(values: LoginFormValues): Promise<AuthResponse> {
     return applyAuth(data)
   } catch (err) {
     throw new Error(getErrorMessage(err, 'Login failed'))
-  }
-}
-
-export async function forgotPassword(values: ForgotPasswordFormValues): Promise<void> {
-  try {
-    await api.post('/auth/forgot-password', {
-      studentId: values.studentId,
-      email: values.email,
-    })
-  } catch (err) {
-    throw new Error(getErrorMessage(err, 'Could not verify your account'))
-  }
-}
-
-export async function resetPassword(values: ResetPasswordFormValues): Promise<void> {
-  try {
-    await api.post('/auth/reset-password', {
-      password: values.password,
-    })
-  } catch (err) {
-    throw new Error(getErrorMessage(err, 'Could not reset password'))
   }
 }
 

@@ -2,6 +2,12 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 const required = ['MONGODB_URI', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET'];
+const PLACEHOLDER_SECRETS = new Set([
+  'change-me-access-secret',
+  'change-me-refresh-secret',
+  'changeme',
+  'secret',
+]);
 
 const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
@@ -35,13 +41,36 @@ const env = {
   },
 };
 
+function isWeakSecret(value) {
+  if (!value || typeof value !== 'string') return true;
+  if (value.length < 16) return true;
+  return PLACEHOLDER_SECRETS.has(value);
+}
+
 function assertRequiredEnv() {
   const missing = required.filter((key) => !process.env[key]);
-  if (missing.length > 0 && env.nodeEnv !== 'test') {
+  const weakJwt =
+    isWeakSecret(process.env.JWT_ACCESS_SECRET) || isWeakSecret(process.env.JWT_REFRESH_SECRET);
+
+  if (env.nodeEnv === 'production') {
+    if (missing.length > 0) {
+      throw new Error(
+        `[env] Missing required environment variables in production: ${missing.join(', ')}`
+      );
+    }
+    if (weakJwt) {
+      throw new Error(
+        '[env] JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be strong (16+ chars, not placeholders) in production'
+      );
+    }
+    return;
+  }
+
+  if ((missing.length > 0 || weakJwt) && env.nodeEnv !== 'test') {
     // eslint-disable-next-line no-console
     console.warn(
-      `[env] Missing recommended environment variables: ${missing.join(', ')}. ` +
-        'Using insecure development defaults — set these in server/.env for production.'
+      `[env] Missing or weak environment variables: ${[...missing, weakJwt ? 'JWT_*' : ''].filter(Boolean).join(', ')}. ` +
+        'Using insecure development defaults — set these in .env for production.'
     );
   }
 }

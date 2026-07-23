@@ -10,20 +10,16 @@ const {
   signAccessToken,
   signRefreshToken,
   verifyRefreshToken,
-  signPasswordResetToken,
-  verifyPasswordResetToken,
   hashToken,
   refreshExpiryDate,
   refreshCookieOptions,
   clearRefreshCookieOptions,
   ssoTicketCookieOptions,
   clearSsoTicketCookieOptions,
-  resetTokenCookieOptions,
-  clearResetTokenCookieOptions,
   REFRESH_COOKIE_NAME,
   SSO_TICKET_COOKIE,
-  RESET_TOKEN_COOKIE,
 } = require('../services/tokenService');
+const securityLog = require('../utils/securityLog');
 
 const BCRYPT_ROUNDS = 12;
 
@@ -123,16 +119,24 @@ const login = asyncHandler(async (req, res) => {
   const { studentId, password } = req.body;
 
   const user = await User.findOne({ studentId }).select('+passwordHash');
-  if (!user) throw ApiError.unauthorized('Invalid student ID or password');
+  if (!user) {
+    securityLog('auth_failure', { reason: 'unknown_user', studentId, ip: req.ip });
+    throw ApiError.unauthorized('Invalid student ID or password');
+  }
 
   const passwordOk = await bcrypt.compare(password, user.passwordHash);
-  if (!passwordOk) throw ApiError.unauthorized('Invalid student ID or password');
+  if (!passwordOk) {
+    securityLog('auth_failure', { reason: 'bad_password', studentId, ip: req.ip });
+    throw ApiError.unauthorized('Invalid student ID or password');
+  }
 
   if (!user.kmitlVerified) {
+    securityLog('auth_failure', { reason: 'unverified', studentId, ip: req.ip });
     throw ApiError.forbidden('Only verified KMITL students can sign in');
   }
 
   const accessToken = await issueSession(res, user);
+  securityLog('auth_success', { userId: user._id.toString(), studentId, ip: req.ip });
 
   res.json({
     success: true,
@@ -174,6 +178,9 @@ const refresh = asyncHandler(async (req, res) => {
     user.refreshTokenHash = null;
     user.refreshTokenExpiresAt = null;
     await user.save();
+    if (isMismatch) {
+      securityLog('refresh_reuse', { userId: user._id.toString(), ip: req.ip });
+    }
     throw ApiError.unauthorized('Session invalid, please log in again');
   }
 
@@ -343,73 +350,6 @@ const ssoPrefill = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * POST /api/auth/forgot-password
- * Verifies studentId + email match, then sets a short-lived reset token
- * cookie. (No email delivery yet — the client continues to the reset form;
- * the token is never returned in the JSON body.)
- */
-const forgotPassword = asyncHandler(async (req, res) => {
-  const { studentId, email } = req.body;
-  const normalizedEmail = String(email).toLowerCase().trim();
-
-  const user = await User.findOne({ studentId, email: normalizedEmail });
-  if (!user) {
-    throw ApiError.badRequest('No account found with this student ID and email');
-  }
-
-  const resetToken = signPasswordResetToken(user);
-  res.cookie(RESET_TOKEN_COOKIE, resetToken, resetTokenCookieOptions());
-
-  res.json({
-    success: true,
-    data: {
-      expiresIn: '15m',
-      message: 'Identity verified. You can set a new password now.',
-    },
-  });
-});
-
-/**
- * POST /api/auth/reset-password
- * Reads the reset token from the httpOnly cookie (not the request body).
- */
-const resetPassword = asyncHandler(async (req, res) => {
-  const { password } = req.body;
-  const resetToken = req.cookies?.[RESET_TOKEN_COOKIE];
-
-  if (!resetToken) {
-    throw ApiError.badRequest('Reset session is missing or expired. Please try again.');
-  }
-
-  let payload;
-  try {
-    payload = verifyPasswordResetToken(resetToken);
-  } catch {
-    res.clearCookie(RESET_TOKEN_COOKIE, clearResetTokenCookieOptions());
-    throw ApiError.badRequest('Reset link is invalid or expired. Please try again.');
-  }
-
-  const user = await User.findById(payload.sub).select('+passwordHash');
-  if (!user) {
-    res.clearCookie(RESET_TOKEN_COOKIE, clearResetTokenCookieOptions());
-    throw ApiError.notFound('User not found');
-  }
-
-  user.passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
-  // Force re-login after reset
-  user.refreshTokenHash = null;
-  user.refreshTokenExpiresAt = null;
-  await user.save();
-
-  res.clearCookie(RESET_TOKEN_COOKIE, clearResetTokenCookieOptions());
-
-  res.json({
-    success: true,
-    data: { message: 'Password updated. You can sign in with your new password.' },
-  });
-});
-
 module.exports = {
   register,
   login,
@@ -419,6 +359,4 @@ module.exports = {
   kmitlSsoStart,
   kmitlSsoCallback,
   ssoPrefill,
-  forgotPassword,
-  resetPassword,
 };

@@ -73,17 +73,9 @@ export function LoginPage() {
           </div>
 
           <div>
-            <div className="mb-1 flex items-center justify-between gap-2">
-              <label className="auth-label mb-0" htmlFor="login-password">
-                {t('loginPassword')}
-              </label>
-              <Link
-                to="/forgot-password"
-                className="text-xs font-medium text-cork-800 underline-offset-2 hover:underline"
-              >
-                {t('loginForgotPassword')}
-              </Link>
-            </div>
+            <label className="auth-label" htmlFor="login-password">
+              {t('loginPassword')}
+            </label>
             <PasswordInput
               {...register('password')}
               id="login-password"

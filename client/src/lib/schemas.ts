@@ -1,12 +1,20 @@
 import { z } from 'zod'
 import { MOOD_TYPES } from '@/types'
 
+const strongPassword = z
+  .string()
+  .min(8, 'Password must be at least 8 characters')
+  .regex(/[a-z]/, 'Password must include a lowercase letter')
+  .regex(/[A-Z]/, 'Password must include an uppercase letter')
+  .regex(/\d/, 'Password must include a digit')
+  .regex(/[^A-Za-z0-9]/, 'Password must include a symbol')
+
 export const loginSchema = z.object({
   studentId: z
     .string()
     .trim()
     .regex(/^\d{8}$/, 'Student ID must be 8 digits'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  password: z.string().min(1, 'Password is required'),
 })
 
 export const registerSchema = z
@@ -29,7 +37,7 @@ export const registerSchema = z
       .int()
       .min(1, 'Year must be 1–8')
       .max(8, 'Year must be 1–8'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
+    password: strongPassword,
     confirmPassword: z.string().min(8, 'Confirm your password'),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -54,40 +62,6 @@ export const composeMoodSchema = z.object({
   emoji: z.string().trim().min(1).max(8).optional(),
 })
 
-export const forgotPasswordSchema = z
-  .object({
-    studentId: z
-      .string()
-      .trim()
-      .regex(/^\d{8}$/, 'Student ID must be 8 digits'),
-    email: z
-      .string()
-      .trim()
-      .email('Enter a valid email')
-      .refine((v) => v.toLowerCase().endsWith('@kmitl.ac.th'), {
-        message: 'Email must be @kmitl.ac.th',
-      }),
-  })
-  .refine(
-    (data) => data.email.toLowerCase().startsWith(`${data.studentId}@`),
-    {
-      message: 'Email should be <studentId>@kmitl.ac.th',
-      path: ['email'],
-    },
-  )
-
-export const resetPasswordSchema = z
-  .object({
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    confirmPassword: z.string().min(8, 'Confirm your password'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  })
-
 export type LoginFormValues = z.infer<typeof loginSchema>
 export type RegisterFormValues = z.infer<typeof registerSchema>
 export type ComposeMoodFormValues = z.infer<typeof composeMoodSchema>
-export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
-export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>

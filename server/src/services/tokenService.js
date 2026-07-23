@@ -27,25 +27,6 @@ function verifyRefreshToken(token) {
   return jwt.verify(token, env.jwt.refreshSecret);
 }
 
-/** Short-lived token for password reset (15 minutes). */
-function signPasswordResetToken(user) {
-  return jwt.sign(
-    { sub: user._id.toString(), purpose: 'password-reset' },
-    env.jwt.accessSecret,
-    { expiresIn: '15m' }
-  );
-}
-
-function verifyPasswordResetToken(token) {
-  const payload = jwt.verify(token, env.jwt.accessSecret);
-  if (payload.purpose !== 'password-reset') {
-    const err = new Error('Invalid password reset token');
-    err.name = 'JsonWebTokenError';
-    throw err;
-  }
-  return payload;
-}
-
 function hashToken(token) {
   return crypto.createHash('sha256').update(token).digest('hex');
 }
@@ -57,7 +38,6 @@ function refreshExpiryDate() {
 
 const REFRESH_COOKIE_NAME = 'refreshToken';
 const SSO_TICKET_COOKIE = 'ssoTicket';
-const RESET_TOKEN_COOKIE = 'resetToken';
 const SHORT_LIVED_COOKIE_MAX_AGE_MS = durationMs('15m');
 
 function baseAuthCookieOptions(maxAge) {
@@ -78,10 +58,6 @@ function ssoTicketCookieOptions() {
   return baseAuthCookieOptions(SHORT_LIVED_COOKIE_MAX_AGE_MS);
 }
 
-function resetTokenCookieOptions() {
-  return baseAuthCookieOptions(SHORT_LIVED_COOKIE_MAX_AGE_MS);
-}
-
 // clearCookie must match the attributes used when the cookie was set,
 // otherwise browsers keep the old refreshToken and the next page load
 // silently restores the session.
@@ -95,27 +71,17 @@ function clearSsoTicketCookieOptions() {
   return opts;
 }
 
-function clearResetTokenCookieOptions() {
-  const { maxAge: _maxAge, ...opts } = resetTokenCookieOptions();
-  return opts;
-}
-
 module.exports = {
   signAccessToken,
   signRefreshToken,
   verifyAccessToken,
   verifyRefreshToken,
-  signPasswordResetToken,
-  verifyPasswordResetToken,
   hashToken,
   refreshExpiryDate,
   refreshCookieOptions,
   clearRefreshCookieOptions,
   ssoTicketCookieOptions,
   clearSsoTicketCookieOptions,
-  resetTokenCookieOptions,
-  clearResetTokenCookieOptions,
   REFRESH_COOKIE_NAME,
   SSO_TICKET_COOKIE,
-  RESET_TOKEN_COOKIE,
 };
