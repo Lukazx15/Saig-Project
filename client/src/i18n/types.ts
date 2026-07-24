@@ -8,8 +8,6 @@ export type MessageKey =
   | 'navCampusVibe'
   | 'navModeration'
   | 'navSignOut'
-  | 'navLogIn'
-  | 'navJoin'
   | 'navMenuOpen'
   | 'navMenuClose'
   | 'langEn'

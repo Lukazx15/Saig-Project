@@ -159,22 +159,7 @@ export function Navbar() {
                   <line x1="21" y1="12" x2="9" y2="12" />
                 </svg>
               </button>
-            ) : (
-              <div className="flex items-center gap-1 sm:gap-2">
-                <NavLink
-                  to="/login"
-                  className="rounded-sm px-2.5 py-1.5 text-xs font-medium text-paper/70 transition-colors hover:bg-night-900 hover:text-paper sm:px-3 sm:text-sm"
-                >
-                  {t('navLogIn')}
-                </NavLink>
-                <NavLink
-                  to="/register"
-                  className="rounded-sm bg-brass-500 px-3 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-brass-400 sm:px-3.5 sm:text-sm"
-                >
-                  {t('navJoin')}
-                </NavLink>
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       </header>

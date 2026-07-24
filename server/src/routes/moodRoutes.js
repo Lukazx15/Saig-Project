@@ -70,28 +70,6 @@ router.get('/', authenticate, listMoodsValidator, validate, moodController.listM
 /**
  * @openapi
  * /api/moods/{id}:
- *   get:
- *     summary: Get a single mood note
- *     tags: [Moods]
- *     security: [{ bearerAuth: [] }]
- *     parameters:
- *       - $ref: '#/components/parameters/MoodId'
- *     responses:
- *       200:
- *         description: Mood found
- *         content:
- *           application/json:
- *             schema: { $ref: '#/components/schemas/MoodResponse' }
- *       401:
- *         description: Not authenticated
- *         content:
- *           application/json:
- *             schema: { $ref: '#/components/schemas/ErrorResponse' }
- *       404:
- *         description: Mood not found
- *         content:
- *           application/json:
- *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  *   patch:
  *     summary: Update a mood note (owner only)
  *     tags: [Moods]
@@ -147,7 +125,6 @@ router.get('/', authenticate, listMoodsValidator, validate, moodController.listM
  *           application/json:
  *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  */
-router.get('/:id', authenticate, moodIdValidator, validate, moodController.getMood);
 router.patch('/:id', authenticate, updateMoodValidator, validate, moodController.updateMood);
 router.delete('/:id', authenticate, moodIdValidator, validate, moodController.deleteMood);
 

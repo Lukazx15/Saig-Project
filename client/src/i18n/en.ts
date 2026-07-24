@@ -9,8 +9,6 @@ export const en: Messages = {
   navCampusVibe: 'Campus Vibe',
   navModeration: 'Moderation',
   navSignOut: 'Sign out',
-  navLogIn: 'Log in',
-  navJoin: 'Join',
   navMenuOpen: 'Open menu',
   navMenuClose: 'Close menu',
   langEn: 'EN',

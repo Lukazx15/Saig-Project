@@ -38,4 +38,4 @@ function parseDateTo(value) {
   return new Date(value);
 }
 
-module.exports = { parseDateFrom, parseDateTo, isDateOnly };
+module.exports = { parseDateFrom, parseDateTo };

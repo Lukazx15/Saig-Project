@@ -51,7 +51,7 @@ const userSchema = new Schema(
     },
     verificationMethod: {
       type: String,
-      enum: ['api', 'format', 'sso', 'none'],
+      enum: ['sso', 'none'],
       default: 'none',
     },
     // Refresh token rotation: only the hash of the *current* valid refresh

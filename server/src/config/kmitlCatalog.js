@@ -343,10 +343,5 @@ function normalizeFacultyMajor(faculty, major, options = {}) {
 }
 
 module.exports = {
-  MAJORS_BY_FACULTY,
-  FACULTY_ALIASES,
-  MAJOR_ALIASES,
   normalizeFacultyMajor,
-  resolveFaculty,
-  majorsForFaculty,
 };

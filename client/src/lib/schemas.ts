@@ -37,7 +37,6 @@ export const composeMoodSchema = z.object({
     .trim()
     .min(1, 'Write something on your note')
     .max(280, 'Keep it under 280 characters'),
-  emoji: z.string().trim().min(1).max(8).optional(),
 })
 
 export type RegisterFormValues = z.infer<typeof registerSchema>

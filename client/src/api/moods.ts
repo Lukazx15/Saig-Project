@@ -5,7 +5,6 @@ import {
   normalizeMoodList,
   normalizeStats,
 } from './normalize'
-import { MOOD_META } from '@/lib/moods'
 import type { MoodFilters, MoodListResult, MoodNote, MoodStats, MoodType } from '@/types'
 
 function buildParams(filters: Partial<MoodFilters>) {
@@ -38,19 +37,15 @@ export async function listMoods(
 export interface ComposeMoodPayload {
   moodType: MoodType
   message: string
-  emoji?: string
 }
 
 export async function createMood(
   payload: ComposeMoodPayload,
 ): Promise<MoodNote> {
   try {
-    const meta = MOOD_META[payload.moodType]
     const res = await api.post('/moods', {
       moodType: payload.moodType,
       message: payload.message,
-      emoji: payload.emoji ?? meta.emoji,
-      color: meta.color,
     })
     const raw = res.data?.data?.mood ?? res.data?.data ?? res.data
     return normalizeMood(raw)
@@ -64,12 +59,7 @@ export async function updateMood(
   payload: Partial<ComposeMoodPayload>,
 ): Promise<MoodNote> {
   try {
-    const body: Record<string, unknown> = { ...payload }
-    if (payload.moodType) {
-      body.color = MOOD_META[payload.moodType].color
-      if (!payload.emoji) body.emoji = MOOD_META[payload.moodType].emoji
-    }
-    const res = await api.patch(`/moods/${id}`, body)
+    const res = await api.patch(`/moods/${id}`, payload)
     const raw = res.data?.data?.mood ?? res.data?.data ?? res.data
     return normalizeMood(raw)
   } catch (err) {

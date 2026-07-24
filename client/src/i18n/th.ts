@@ -12,8 +12,6 @@ export const th: Messages = {
   navCampusVibe: 'มู้ดโดยรวม',
   navModeration: 'จัดการโน้ต',
   navSignOut: 'ออกจากระบบ',
-  navLogIn: 'เข้าสู่ระบบ',
-  navJoin: 'สมัครสมาชิก',
   navMenuOpen: 'เปิดเมนู',
   navMenuClose: 'ปิดเมนู',
   langEn: 'EN',

@@ -80,16 +80,12 @@ export async function logout(): Promise<void> {
 }
 
 export async function fetchCurrentUser(): Promise<User | null> {
-  const candidates = ['/auth/me', '/users/me', '/auth/profile']
-  for (const path of candidates) {
-    try {
-      const { data } = await api.get(path)
-      return normalizeUser(data)
-    } catch {
-      // try next shape
-    }
+  try {
+    const { data } = await api.get('/auth/me')
+    return normalizeUser(data)
+  } catch {
+    return null
   }
-  return null
 }
 
 /** Restore session from httpOnly refresh cookie; returns user or null. */

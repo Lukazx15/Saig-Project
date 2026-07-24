@@ -20,10 +20,6 @@ const env = {
     accessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m',
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   },
-  kmitl: {
-    apiKey: process.env.KMITL_API_KEY || '',
-    apiBaseUrl: process.env.KMITL_API_BASE_URL || 'https://api.kmitl.ac.th/v1',
-  },
   oidc: {
     issuer: process.env.KMITL_OIDC_ISSUER || 'https://sso.kmitl.ac.th/realms/kmitl',
     clientId: process.env.KMITL_OIDC_CLIENT_ID || '',

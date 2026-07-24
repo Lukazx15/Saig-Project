@@ -72,15 +72,6 @@ const listMoods = asyncHandler(async (req, res) => {
 });
 
 /**
- * GET /api/moods/:id
- */
-const getMood = asyncHandler(async (req, res) => {
-  const mood = await Mood.findById(req.params.id);
-  if (!mood) throw ApiError.notFound('Mood not found');
-  res.json({ success: true, data: { mood: mood.toPublicJSON(req.user) } });
-});
-
-/**
  * PATCH /api/moods/:id — owner only
  */
 const updateMood = asyncHandler(async (req, res) => {
@@ -116,4 +107,4 @@ const deleteMood = asyncHandler(async (req, res) => {
   res.json({ success: true, data: null, message: 'Mood deleted' });
 });
 
-module.exports = { createMood, listMoods, getMood, updateMood, deleteMood };
+module.exports = { createMood, listMoods, updateMood, deleteMood };
