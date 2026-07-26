@@ -10,11 +10,16 @@ interface GuestRouteProps {
 
 /** Guest-only routes: authenticated users are sent to the board. */
 export function GuestRoute({ children }: GuestRouteProps) {
-  const { isAuthenticated, isBootstrapping } = useAuth()
+  const { isAuthenticated, isBootstrapping, isApiWaking } = useAuth()
   const { t } = useLocale()
 
   if (isBootstrapping) {
-    return <BrandLoader message={t('checkingSession')} />
+    return (
+      <BrandLoader
+        message={isApiWaking ? t('wakingSession') : t('checkingSession')}
+        detail={isApiWaking ? t('wakingSessionHint') : undefined}
+      />
+    )
   }
 
   if (isAuthenticated) {

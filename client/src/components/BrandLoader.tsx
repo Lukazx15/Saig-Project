@@ -3,12 +3,10 @@ import { useLocale } from '@/context/LocaleContext'
 
 interface BrandLoaderProps {
   message?: string
-  /** Full-viewport dusk + cork pulse (auth/session). Board uses compact. */
+  detail?: string
   variant?: 'page' | 'board'
 }
-
-/** Branded session / board wait — pin + scrap paper, never an empty night void. */
-export function BrandLoader({ message, variant = 'page' }: BrandLoaderProps) {
+export function BrandLoader({ message, detail, variant = 'page' }: BrandLoaderProps) {
   const { t } = useLocale()
   const label = message ?? t('loadingSession')
 
@@ -25,6 +23,14 @@ export function BrandLoader({ message, variant = 'page' }: BrandLoaderProps) {
           >
             {label}
           </p>
+          {detail ? (
+            <p
+              className="mt-2 max-w-[16rem] text-sm leading-snug text-ink-soft/70 sm:max-w-[18rem]"
+              style={{ fontFamily: 'var(--font-body)' }}
+            >
+              {detail}
+            </p>
+          ) : null}
         </div>
         <div className="pin-shadow brand-loader-pin absolute -top-3 left-1/2 -translate-x-1/2">
           <PinIcon className="h-7 w-7" />

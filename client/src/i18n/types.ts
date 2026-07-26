@@ -15,6 +15,8 @@ export type MessageKey =
   | 'langSwitch'
   | 'loadingSession'
   | 'checkingSession'
+  | 'wakingSession'
+  | 'wakingSessionHint'
   | 'loginTitle'
   | 'loginSubtitle'
   | 'loginStudentId'

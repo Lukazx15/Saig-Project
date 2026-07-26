@@ -10,12 +10,17 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, requireAdmin }: ProtectedRouteProps) {
-  const { isAuthenticated, isAdmin, isBootstrapping } = useAuth()
+  const { isAuthenticated, isAdmin, isBootstrapping, isApiWaking } = useAuth()
   const { t } = useLocale()
   const location = useLocation()
 
   if (isBootstrapping) {
-    return <BrandLoader message={t('loadingSession')} />
+    return (
+      <BrandLoader
+        message={isApiWaking ? t('wakingSession') : t('loadingSession')}
+        detail={isApiWaking ? t('wakingSessionHint') : undefined}
+      />
+    )
   }
 
   if (!isAuthenticated) {

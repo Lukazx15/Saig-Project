@@ -17,6 +17,8 @@ export const en: Messages = {
 
   loadingSession: 'Loading your session…',
   checkingSession: 'Checking your session…',
+  wakingSession: 'API is waking up…',
+  wakingSessionHint: 'First visit after idle can take up to a minute — hang tight.',
 
   loginTitle: 'Welcome back',
   loginSubtitle: 'KMITL students only — sign in with your KMITL account.',

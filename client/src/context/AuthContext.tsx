@@ -12,11 +12,16 @@ import { registerUnauthorizedHandler } from '@/api/client'
 import type { User } from '@/types'
 import type { RegisterFormValues } from '@/lib/schemas'
 
+/** After this wait, show cold-start copy instead of a generic spinner. */
+const API_WAKING_AFTER_MS = 4_000
+
 interface AuthContextValue {
   user: User | null
   isAuthenticated: boolean
   isAdmin: boolean
   isBootstrapping: boolean
+  /** True when bootstrap is still running past the cold-start threshold. */
+  isApiWaking: boolean
   register: (values: RegisterFormValues) => Promise<void>
   logout: () => Promise<void>
 }
@@ -26,20 +31,30 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isBootstrapping, setIsBootstrapping] = useState(true)
+  const [isApiWaking, setIsApiWaking] = useState(false)
 
   useEffect(() => {
     registerUnauthorizedHandler(() => setUser(null))
     let mounted = true
+    const wakeTimer = window.setTimeout(() => {
+      if (mounted) setIsApiWaking(true)
+    }, API_WAKING_AFTER_MS)
+
     authApi
       .bootstrapSession()
       .then((sessionUser) => {
         if (mounted) setUser(sessionUser)
       })
       .finally(() => {
-        if (mounted) setIsBootstrapping(false)
+        if (mounted) {
+          setIsBootstrapping(false)
+          setIsApiWaking(false)
+        }
+        window.clearTimeout(wakeTimer)
       })
     return () => {
       mounted = false
+      window.clearTimeout(wakeTimer)
       registerUnauthorizedHandler(null)
     }
   }, [])
@@ -60,10 +75,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: Boolean(user),
       isAdmin: user?.role === 'admin',
       isBootstrapping,
+      isApiWaking,
       register,
       logout,
     }),
-    [user, isBootstrapping, register, logout],
+    [user, isBootstrapping, isApiWaking, register, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

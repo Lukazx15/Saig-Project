@@ -1,7 +1,32 @@
+import axios from 'axios'
 import { api, API_BASE_URL, setAccessToken } from './client'
 import { getErrorMessage, normalizeAuthResponse, normalizeUser } from './normalize'
 import type { AuthResponse, User } from '@/types'
 import type { RegisterFormValues } from '@/lib/schemas'
+
+/** Per-attempt wait while Render free tier is spinning up. */
+const BOOTSTRAP_TIMEOUT_MS = 20_000
+const BOOTSTRAP_ATTEMPTS = 4
+const BOOTSTRAP_BASE_DELAY_MS = 1_000
+
+function sleep(ms: number) {
+  return new Promise<void>((resolve) => {
+    window.setTimeout(resolve, ms)
+  })
+}
+
+function isNoSessionError(err: unknown): boolean {
+  if (!axios.isAxiosError(err)) return false
+  const status = err.response?.status
+  return status === 401 || status === 403
+}
+
+function isTransientError(err: unknown): boolean {
+  if (!axios.isAxiosError(err)) return true
+  if (!err.response) return true
+  const status = err.response.status
+  return status === 408 || status === 502 || status === 503 || status === 504
+}
 
 async function applyAuth(raw: unknown): Promise<AuthResponse> {
   const auth = normalizeAuthResponse(raw)
@@ -88,10 +113,41 @@ export async function fetchCurrentUser(): Promise<User | null> {
   }
 }
 
-/** Restore session from httpOnly refresh cookie; returns user or null. */
+/**
+ * Restore session from httpOnly refresh cookie; returns user or null.
+ * Retries transient failures (cold starts / proxy timeouts) with backoff.
+ */
 export async function bootstrapSession(): Promise<User | null> {
-  const refreshed = await refresh()
-  if (!refreshed?.accessToken) return null
-  if (refreshed.user?.id) return refreshed.user
-  return fetchCurrentUser()
+  for (let attempt = 1; attempt <= BOOTSTRAP_ATTEMPTS; attempt++) {
+    try {
+      const { data } = await api.post(
+        '/auth/refresh',
+        {},
+        { timeout: BOOTSTRAP_TIMEOUT_MS },
+      )
+      const refreshed = await applyAuth(data)
+      if (!refreshed.accessToken) {
+        setAccessToken(null)
+        return null
+      }
+      if (refreshed.user?.id) return refreshed.user
+      return fetchCurrentUser()
+    } catch (err) {
+      if (isNoSessionError(err)) {
+        setAccessToken(null)
+        return null
+      }
+
+      const canRetry = isTransientError(err) && attempt < BOOTSTRAP_ATTEMPTS
+      if (!canRetry) {
+        setAccessToken(null)
+        return null
+      }
+
+      await sleep(BOOTSTRAP_BASE_DELAY_MS * 2 ** (attempt - 1))
+    }
+  }
+
+  setAccessToken(null)
+  return null
 }

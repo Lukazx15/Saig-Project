@@ -20,6 +20,8 @@ export const th: Messages = {
 
   loadingSession: 'กำลังเปิดเซสชัน…',
   checkingSession: 'กำลังเช็กเซสชัน…',
+  wakingSession: 'เซิร์ฟเวอร์กำลังตื่น…',
+  wakingSessionHint: 'ถ้าไม่ได้เข้าสักพัก อาจใช้เวลาถึงหนึ่งนาที — รอแป๊บนะ',
 
   loginTitle: 'เจอกันอีกครั้ง',
   loginSubtitle: 'สำหรับนักศึกษา KMITL เท่านั้น — เข้าสู่ระบบด้วยบัญชี KMITL',
