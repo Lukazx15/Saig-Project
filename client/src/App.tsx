@@ -9,6 +9,7 @@ import { RegisterPage } from '@/pages/RegisterPage'
 import { StatsPage } from '@/pages/StatsPage'
 import { AdminPage } from '@/pages/AdminPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
+import { SixSevenPage } from '@/pages/SixSevenPage'
 
 /**
  * Routing model:
@@ -64,11 +65,19 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/67"
+          element={
+            <ProtectedRoute>
+              <SixSevenPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/404" element={<NotFoundPage />} />
-        <Route path="*" element={<Navigate to="/404" replace />} />
-      </Routes>
-    </AuthProvider>
-  )
+      <Route path="*" element={<Navigate to="/404" replace />} />
+    </Routes>
+  </AuthProvider>
+  );
 }
 
-export default App
+export default App;
