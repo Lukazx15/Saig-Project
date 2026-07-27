@@ -6,8 +6,8 @@ export const MOOD_META: Record<
   { color: string; tint: string }
 > = {
   happy: {
-    color: '#FFE066',
-    tint: 'rgba(255, 224, 102, 0.35)',
+    color: '#FFD600',
+    tint: 'rgb(255, 224, 102)',
   },
   calm: {
     color: '#A8DADC',
@@ -18,8 +18,8 @@ export const MOOD_META: Record<
     tint: 'rgba(205, 180, 219, 0.4)',
   },
   stressed: {
-    color: '#F4A261',
-    tint: 'rgba(244, 162, 97, 0.35)',
+    color: '#980000',
+    tint: 'rgb(142, 64, 0)',
   },
   sad: {
     color: '#90CAF9',
@@ -34,24 +34,24 @@ export const MOOD_META: Record<
     tint: 'rgba(230, 57, 70, 0.35)',
   },
   sleepy: {
-    color: '#CDB4DB',
-    tint: 'rgba(205, 180, 219, 0.4)',
+    color: '#00A1FE',
+    tint: 'rgba(0, 161, 254, 0.4)',
   },
   hungry: {
-    color: '#FF9F1C',
-    tint: 'rgba(255, 159, 28, 0.35)',
+    color: '#F5F198',
+    tint: 'rgb(245, 241, 152)',
   },
   cold: {
-    color: '#A8DADC',
-    tint: 'rgba(168, 218, 220, 0.38)',
+    color: '#5CC6FF',
+    tint: 'rgb(92, 198, 255)',
   },
   hot: {
-    color: '#F4A261',
-    tint: 'rgba(244, 162, 97, 0.35)',
+    color: '#FFB75E',
+    tint: 'rgb(255, 183, 94)',
   },
   sick: {
-    color: '#CDB4DB',
-    tint: 'rgba(205, 180, 219, 0.4)',
+    color: '#562672',
+    tint: 'rgb(86, 38, 114)',
   },
 }
 

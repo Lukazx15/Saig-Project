@@ -3,10 +3,6 @@ import { Navbar } from '@/components/Navbar'
 
 interface LayoutProps {
   children: ReactNode
-  /**
-   * 'plain' — solid dusk pages with navbar (board/stats/admin).
-   * 'auth' — full-bleed login/register (no app chrome).
-   */
   variant?: 'plain' | 'auth'
 }
 
