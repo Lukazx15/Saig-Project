@@ -1,4 +1,5 @@
 import type { Locale, MessageKey, Messages } from './types'
+import type { MoodType } from '@/types'
 import { en } from './en'
 import { th } from './th'
 
@@ -17,4 +18,11 @@ export const MOOD_LABEL_KEYS = {
   sad: 'moodSad',
   excited: 'moodExcited',
   angry: 'moodAngry',
-} as const satisfies Record<string, MessageKey>
+  sleepy: 'moodSleepy',
+  hungry: 'moodHungry',
+  thirsty: 'moodThirsty',
+  cold: 'moodCold',
+  hot: 'moodHot',
+  sick: 'moodSick',
+  pain: 'moodPain', 
+} as const satisfies Record<MoodType, MessageKey>

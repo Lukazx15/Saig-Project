@@ -3,42 +3,63 @@ import { MOOD_TYPES } from '@/types'
 
 export const MOOD_META: Record<
   MoodType,
-  { emoji: string; color: string; tint: string }
+  { color: string; tint: string }
 > = {
   happy: {
-    emoji: '😊',
     color: '#FFE066',
     tint: 'rgba(255, 224, 102, 0.35)',
   },
   calm: {
-    emoji: '🌿',
     color: '#A8DADC',
     tint: 'rgba(168, 218, 220, 0.38)',
   },
   tired: {
-    emoji: '😴',
     color: '#CDB4DB',
     tint: 'rgba(205, 180, 219, 0.4)',
   },
   stressed: {
-    emoji: '😰',
     color: '#F4A261',
     tint: 'rgba(244, 162, 97, 0.35)',
   },
   sad: {
-    emoji: '😔',
     color: '#90CAF9',
     tint: 'rgba(144, 202, 249, 0.38)',
   },
   excited: {
-    emoji: '✨',
     color: '#FF9F1C',
     tint: 'rgba(255, 159, 28, 0.35)',
   },
   angry: {
-    emoji: '😤',
     color: '#E63946',
     tint: 'rgba(230, 57, 70, 0.35)',
+  },
+  sleepy: {
+    color: '#CDB4DB',
+    tint: 'rgba(205, 180, 219, 0.4)',
+  },
+  hungry: {
+    color: '#FF9F1C',
+    tint: 'rgba(255, 159, 28, 0.35)',
+  },
+  thirsty: {
+    color: '#E63946',
+    tint: 'rgba(230, 57, 70, 0.35)',
+  },
+  cold: {
+    color: '#A8DADC',
+    tint: 'rgba(168, 218, 220, 0.38)',
+  },
+  hot: {
+    color: '#F4A261',
+    tint: 'rgba(244, 162, 97, 0.35)',
+  },
+  sick: {
+    color: '#CDB4DB',
+    tint: 'rgba(205, 180, 219, 0.4)',
+  },
+  pain: {
+    color: '#90CAF9',
+    tint: 'rgba(144, 202, 249, 0.38)',
   },
 }
 

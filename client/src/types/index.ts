@@ -6,6 +6,13 @@ export const MOOD_TYPES = [
   'sad',
   'excited',
   'angry',
+  'sleepy',
+  'hungry',
+  'thirsty',
+  'cold',
+  'hot',
+  'sick',
+  'pain',
 ] as const
 
 export type MoodType = (typeof MOOD_TYPES)[number]

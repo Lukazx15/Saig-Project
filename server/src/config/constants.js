@@ -6,6 +6,14 @@ const MOOD_COLORS = {
   sad: '#90CAF9',
   excited: '#FF9F1C',
   angry: '#E63946',
+  sleepy: '#90CAF9',
+  hungry: '#FF9F1C',
+  thirsty: '#E63946',
+  cold: '#A8DADC',
+  hot: '#F4A261',
+  sick: '#CDB4DB',
+  pain: '#90CAF9',
+  other: '#E63946',
 };
 
 const MOOD_TYPES = Object.keys(MOOD_COLORS);
