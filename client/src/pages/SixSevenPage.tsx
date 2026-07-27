@@ -1,7 +1,21 @@
+import { useEffect } from 'react'
 import { Layout } from '@/components/Layout'
 import { PinIcon } from '@/components/PinIcon'
 
+const TENOR_EMBED_SRC = 'https://tenor.com/embed.js'
+
 export function SixSevenPage() {
+  useEffect(() => {
+    document.querySelector(`script[src="${TENOR_EMBED_SRC}"]`)?.remove()
+    const script = document.createElement('script')
+    script.src = TENOR_EMBED_SRC
+    script.async = true
+    document.body.appendChild(script)
+    return () => {
+      script.remove()
+    }
+  }, [])
+
   return (
     <Layout variant="plain">
       <div className="cork-texture flex min-h-[calc(100vh-64px)] flex-col items-center justify-center gap-4 px-4 text-center">
@@ -9,15 +23,18 @@ export function SixSevenPage() {
           <div className="pin-shadow absolute -top-3 left-1/2 -translate-x-1/2">
             <PinIcon className="h-7 w-7" />
           </div>
-          <div className="relative aspect-video w-full overflow-hidden rounded-sm">
-            <iframe
-              className="absolute inset-0 h-full w-full"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
-              title="67"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-            />
+          <div
+            className="tenor-gif-embed w-full overflow-hidden rounded-sm"
+            data-postid="15087359750872636720"
+            data-share-method="host"
+            data-aspect-ratio="1.76596"
+            data-width="100%"
+          >
+            <a href="https://tenor.com/view/max-verstappen-f1-formule-1-gif-15087359750872636720">
+              Max Verstappen F1 GIF
+            </a>
+            from{' '}
+            <a href="https://tenor.com/search/max+verstappen-gifs">Max Verstappen GIFs</a>
           </div>
         </div>
       </div>
