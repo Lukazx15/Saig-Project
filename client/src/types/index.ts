@@ -34,7 +34,6 @@ export interface User {
 export interface MoodNote {
   id: string
   moodType: MoodType
-  emoji: string
   message: string
   color: string
   alias: string

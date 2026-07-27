@@ -9,7 +9,7 @@ import type {
   UserRole,
 } from '@/types'
 import { MOOD_TYPES } from '@/types'
-import { colorForMood, dominantFromDistribution, isMoodType, MOOD_META } from '@/lib/moods'
+import { colorForMood, dominantFromDistribution, isMoodType } from '@/lib/moods'
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value !== null && typeof value === 'object'
@@ -94,7 +94,6 @@ export function normalizeMood(raw: unknown): MoodNote {
   return {
     id: pickString(r.id, r._id),
     moodType,
-    emoji: pickString(r.emoji, MOOD_META[moodType].emoji) || MOOD_META[moodType].emoji,
     message: pickString(r.message, r.content, r.text, r.body),
     color: colorForMood(moodType, pickString(r.color) || undefined),
     alias: pickString(r.alias, r.anonymousAlias, r.displayName, 'Anonymous Student'),
