@@ -12,7 +12,7 @@ export function SixSevenPage() {
           <div className="relative aspect-video w-full overflow-hidden rounded-sm">
             <iframe
               className="absolute inset-0 h-full w-full"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=0"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
               title="67"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
