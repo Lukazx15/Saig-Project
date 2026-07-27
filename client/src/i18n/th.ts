@@ -51,7 +51,7 @@ export const th: Messages = {
   registerSelectMajor: 'เลือกสาขา…',
   registerSelectFacultyFirst: 'เลือกคณะก่อน…',
 
-  boardTitle: 'วันนี้สาขามู้ดไหน?',
+  boardTitle: 'วันนี้คุณรู้สึกอย่างไร',
   boardSubtitle: 'โน้ตอารมณ์ไม่ระบุชื่อจากเพื่อนขี้เสือกใน KMITL',
   boardLoading: 'กำลังดึงกระดาน…',
   boardEmpty: 'ยังไม่มีโน้ตตามตัวกรองนี้ เป็นคนแรกที่ปักเลยไหม',
