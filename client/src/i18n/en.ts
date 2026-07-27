@@ -77,11 +77,9 @@ export const en: Messages = {
   moodAngry: 'Angry',
   moodSleepy: 'Sleepy',
   moodHungry: 'Hungry',
-  moodThirsty: 'Thirsty',
   moodCold: 'Cold',
   moodHot: 'Hot',
   moodSick: 'Sick',
-  moodPain: 'In pain',
 
   composeTitle: 'Pin your mood',
   composeFeeling: 'How are you feeling?',

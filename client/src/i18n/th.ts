@@ -80,11 +80,9 @@ export const th: Messages = {
   moodAngry: 'โมโห',
   moodSleepy: 'ง่วงนอน',
   moodHungry: 'หิว',
-  moodThirsty: 'กระหาย',
   moodCold: 'หนาว',
   moodHot: 'ร้อน',
   moodSick: 'ไม่สบาย',
-  moodPain: 'เจ็บปวด',
 
   composeTitle: 'แปะโน้ตอารมณ์ของคุณ',
   composeFeeling: 'ตอนนี้มู้ดไหน',

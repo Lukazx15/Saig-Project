@@ -20,9 +20,7 @@ export const MOOD_LABEL_KEYS = {
   angry: 'moodAngry',
   sleepy: 'moodSleepy',
   hungry: 'moodHungry',
-  thirsty: 'moodThirsty',
   cold: 'moodCold',
   hot: 'moodHot',
   sick: 'moodSick',
-  pain: 'moodPain', 
 } as const satisfies Record<MoodType, MessageKey>

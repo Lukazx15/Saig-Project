@@ -8,11 +8,9 @@ const MOOD_COLORS = {
   angry: '#E63946',
   sleepy: '#90CAF9',
   hungry: '#FF9F1C',
-  thirsty: '#E63946',
   cold: '#A8DADC',
   hot: '#F4A261',
   sick: '#CDB4DB',
-  pain: '#90CAF9',
   other: '#E63946',
 };
 

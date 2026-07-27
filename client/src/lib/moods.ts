@@ -41,10 +41,6 @@ export const MOOD_META: Record<
     color: '#FF9F1C',
     tint: 'rgba(255, 159, 28, 0.35)',
   },
-  thirsty: {
-    color: '#E63946',
-    tint: 'rgba(230, 57, 70, 0.35)',
-  },
   cold: {
     color: '#A8DADC',
     tint: 'rgba(168, 218, 220, 0.38)',
@@ -56,10 +52,6 @@ export const MOOD_META: Record<
   sick: {
     color: '#CDB4DB',
     tint: 'rgba(205, 180, 219, 0.4)',
-  },
-  pain: {
-    color: '#90CAF9',
-    tint: 'rgba(144, 202, 249, 0.38)',
   },
 }
 
