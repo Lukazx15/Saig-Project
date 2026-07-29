@@ -1,36 +1,40 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import confetti from 'canvas-confetti'
 import { Layout } from '@/components/Layout'
 import { PinIcon } from '@/components/PinIcon'
 
 const TENOR_EMBED_SRC = 'https://tenor.com/embed.js'
 
+const FIREWORK_COLORS = ['#ff6b35', '#f7c948', '#2ec4b6', '#e63946', '#457b9d']
+
 /** Fire a short fireworks-style burst from one side of the screen. */
 function fireFirework(originX: number) {
   confetti({
-    particleCount: 60,
-    spread: 70,
-    startVelocity: 45,
-    origin: { x: originX, y: 0.7 },
-    colors: ['#ff6b35', '#f7c948', '#2ec4b6', '#e63946', '#457b9d'],
-    ticks: 200,
-    gravity: 1.1,
-    scalar: 1.1,
+    particleCount: 80,
+    spread: 80,
+    startVelocity: 50,
+    origin: { x: originX, y: 0.75 },
+    colors: FIREWORK_COLORS,
+    ticks: 220,
+    gravity: 1.05,
+    scalar: 1.15,
+    zIndex: 9999,
   })
 }
 
-/** Launch a few staggered bursts so it feels like fireworks, not just confetti. */
-function launchFireworks() {
-  const delays = [0, 250, 500, 800]
-  const origins = [0.2, 0.8, 0.35, 0.65]
+/**
+ * Launch staggered bursts. Returns timeout ids so the caller can cancel
+ * them if the page unmounts (important under React Strict Mode).
+ */
+function launchFireworks(schedule: (fn: () => void, ms: number) => void) {
+  const origins = [0.15, 0.85, 0.3, 0.7, 0.5]
+  const delays = [0, 200, 450, 700, 950]
   delays.forEach((delay, i) => {
-    window.setTimeout(() => fireFirework(origins[i] ?? 0.5), delay)
+    schedule(() => fireFirework(origins[i] ?? 0.5), delay)
   })
 }
 
 export function SixSevenPage() {
-  const didLaunch = useRef(false)
-
   useEffect(() => {
     document.querySelector(`script[src="${TENOR_EMBED_SRC}"]`)?.remove()
     const script = document.createElement('script')
@@ -42,12 +46,21 @@ export function SixSevenPage() {
     }
   }, [])
 
-  // Auto-launch fireworks once when the page mounts.
+  // Auto-launch on mount. Do NOT gate with a ref — Strict Mode runs
+  // effect → cleanup → effect, and a ref would skip the second run after
+  // the first timeout was already cleared.
   useEffect(() => {
-    if (didLaunch.current) return
-    didLaunch.current = true
-    const timer = window.setTimeout(launchFireworks, 400)
-    return () => window.clearTimeout(timer)
+    const timers: number[] = []
+    const schedule = (fn: () => void, ms: number) => {
+      timers.push(window.setTimeout(fn, ms))
+    }
+
+    // Small delay so the page paints first, then fireworks.
+    schedule(() => launchFireworks(schedule), 300)
+
+    return () => {
+      timers.forEach((id) => window.clearTimeout(id))
+    }
   }, [])
 
   return (
