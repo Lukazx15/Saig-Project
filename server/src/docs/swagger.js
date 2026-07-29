@@ -264,9 +264,8 @@ const options = {
         description:
           'KMITL SSO + JWT sessions. No password login. Cookie routes need Origin header.',
       },
-      { name: 'Moods', description: 'Anonymous mood note CRUD (Bearer required)' },
+      { name: 'Moods', description: 'Anonymous mood note CRUD (Bearer required). Admins can delete any note via DELETE /api/moods/{id}.' },
       { name: 'Stats', description: 'Aggregated mood statistics (Bearer required)' },
-      { name: 'Admin', description: 'Admin-only moderation (Bearer + role admin)' },
     ],
   },
   // swagger-jsdoc resolves `apis` via glob matching, which treats `\` as an

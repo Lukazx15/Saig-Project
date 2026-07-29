@@ -2,7 +2,6 @@ const express = require('express');
 const authRoutes = require('./authRoutes');
 const moodRoutes = require('./moodRoutes');
 const statsRoutes = require('./statsRoutes');
-const adminRoutes = require('./adminRoutes');
 
 const router = express.Router();
 
@@ -31,6 +30,5 @@ router.get('/health', (_req, res) => res.json({ success: true, data: { status: '
 router.use('/auth', authRoutes);
 router.use('/moods', moodRoutes);
 router.use('/stats', statsRoutes);
-router.use('/admin', adminRoutes);
 
 module.exports = router;
