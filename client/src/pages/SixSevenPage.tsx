@@ -1,10 +1,46 @@
 import { useEffect } from 'react'
+import confetti from 'canvas-confetti'
 import { Layout } from '@/components/Layout'
 import { PinIcon } from '@/components/PinIcon'
+import { useAuth } from '@/context/AuthContext'
 
 const TENOR_EMBED_SRC = 'https://tenor.com/embed.js'
 
+const FIREWORK_COLORS = ['#ff6b35', '#f7c948', '#2ec4b6', '#e63946', '#457b9d']
+
+/** Delay after the real /67 page is on screen (session loader already gone). */
+const FIREWORKS_AFTER_PAGE_MS = 700
+
+/** Fire a short fireworks-style burst from one side of the screen. */
+function fireFirework(originX: number) {
+  confetti({
+    particleCount: 80,
+    spread: 80,
+    startVelocity: 50,
+    origin: { x: originX, y: 0.75 },
+    colors: FIREWORK_COLORS,
+    ticks: 220,
+    gravity: 1.05,
+    scalar: 1.15,
+    zIndex: 9999,
+  })
+}
+
+/**
+ * Launch staggered bursts. Uses `schedule` so timeouts can be cleared
+ * if the page unmounts (important under React Strict Mode).
+ */
+function launchFireworks(schedule: (fn: () => void, ms: number) => void) {
+  const origins = [0.15, 0.85, 0.3, 0.7, 0.5]
+  const delays = [0, 200, 450, 700, 950]
+  delays.forEach((delay, i) => {
+    schedule(() => fireFirework(origins[i] ?? 0.5), delay)
+  })
+}
+
 export function SixSevenPage() {
+  const { isBootstrapping, isAuthenticated } = useAuth()
+
   useEffect(() => {
     document.querySelector(`script[src="${TENOR_EMBED_SRC}"]`)?.remove()
     const script = document.createElement('script')
@@ -15,6 +51,55 @@ export function SixSevenPage() {
       script.remove()
     }
   }, [])
+
+  // Only celebrate after session bootstrap finishes and /67 is actually visible.
+  // ProtectedRoute already swaps BrandLoader → this page when ready; gating here
+  // makes sure we never schedule fireworks against the loading screen.
+  useEffect(() => {
+    if (isBootstrapping || !isAuthenticated) return
+
+    let cancelled = false
+    const timers: number[] = []
+    const rafIds: number[] = []
+
+    const schedule = (fn: () => void, ms: number) => {
+      timers.push(
+        window.setTimeout(() => {
+          if (!cancelled) fn()
+        }, ms),
+      )
+    }
+
+    const start = () => {
+      // Double rAF: wait until after the BrandLoader → page paint.
+      const outer = requestAnimationFrame(() => {
+        const inner = requestAnimationFrame(() => {
+          schedule(() => launchFireworks(schedule), FIREWORKS_AFTER_PAGE_MS)
+        })
+        rafIds.push(inner)
+      })
+      rafIds.push(outer)
+    }
+
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') return
+      document.removeEventListener('visibilitychange', onVisible)
+      start()
+    }
+
+    if (document.visibilityState === 'visible') {
+      start()
+    } else {
+      document.addEventListener('visibilitychange', onVisible)
+    }
+
+    return () => {
+      cancelled = true
+      document.removeEventListener('visibilitychange', onVisible)
+      rafIds.forEach((id) => cancelAnimationFrame(id))
+      timers.forEach((id) => window.clearTimeout(id))
+    }
+  }, [isBootstrapping, isAuthenticated])
 
   return (
     <Layout variant="plain">
