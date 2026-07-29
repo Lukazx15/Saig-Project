@@ -70,13 +70,6 @@ export function SixSevenPage() {
             from{' '}
             <a href="https://tenor.com/search/max+verstappen-gifs">Max Verstappen GIFs</a>
           </div>
-          <button
-            type="button"
-            onClick={launchFireworks}
-            className="mt-6 rounded-sm bg-ink px-4 py-2 text-sm font-medium text-paper transition hover:opacity-90"
-          >
-            ยิงพลุอีกครั้ง
-          </button>
         </div>
       </div>
     </Layout>
