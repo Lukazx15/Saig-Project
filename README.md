@@ -10,7 +10,7 @@ Public notes show only an **alias**, **faculty**, **major**, and **year**.
 
 ## Features
 
-- **Corkboard feed** — color-coded mood notes (happy, calm, tired, stressed, sad, excited, angry) with filter, search, and pagination
+- **Corkboard feed** — color-coded mood notes (happy, calm, tired, stressed, sad, excited, angry, etc) with filter, search, and pagination
 - **Anonymous by design** — real identity stays on the server; the API never returns student ID, name, or email on moods
 - **KMITL SSO only** — sign-in and registration use KMITL OIDC; no local passwords are stored
 - **SSO registration** — new accounts continue with KMITL first; the register form is prefilled, then you choose faculty/major/year
