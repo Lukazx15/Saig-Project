@@ -280,8 +280,8 @@ export function rotationForId(id: string): number {
   for (let i = 0; i < id.length; i += 1) {
     hash = (hash * 31 + id.charCodeAt(i)) | 0
   }
-  // Keep tilt subtle so neighbors don't cover each other on a 2-col phone grid.
-  return ((hash % 7) - 3) * 0.7
+  // Keep tilt subtle (±~1.4°) so notes feel pinned, not skewed.
+  return ((hash % 7) - 3) * 0.45
 }
 
 /** Stable vertical nudge so the board feels pinned, not a uniform card grid. */

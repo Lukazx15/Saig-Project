@@ -230,6 +230,21 @@
 .filter-select[type='date'] {
   min-height: 2.25rem;
   line-height: 1.25;
+  padding-inline: 0.4rem 0.35rem;
+  font-size: 0.75rem;
+}
+
+.filter-select[type='date']::-webkit-calendar-picker-indicator {
+  margin-inline-start: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+@media (min-width: 640px) {
+  .filter-select[type='date'] {
+    font-size: 0.8125rem;
+    padding-inline: 0.5rem;
+  }
 }
 
 @keyframes brand-loader-pin {

@@ -77,8 +77,8 @@ export function FilterBar({ filters, onChange, onReset }: FilterBarProps) {
           })}
         </div>
 
-        <div className="mt-2.5 grid grid-cols-2 gap-2 sm:mt-3 sm:grid-cols-4">
-          <label className="flex flex-col gap-1">
+        <div className="mt-2.5 grid grid-cols-1 gap-2 sm:mt-3 sm:grid-cols-4">
+          <label className="flex min-w-0 flex-col gap-1">
             <span className="text-[11px] font-medium text-ink-soft/80">{t('filterFaculty')}</span>
             <select
               value={filters.faculty}
@@ -94,7 +94,7 @@ export function FilterBar({ filters, onChange, onReset }: FilterBarProps) {
             </select>
           </label>
 
-          <label className="flex flex-col gap-1">
+          <label className="flex min-w-0 flex-col gap-1">
             <span className="text-[11px] font-medium text-ink-soft/80">{t('filterMajor')}</span>
             <select
               value={filters.major}

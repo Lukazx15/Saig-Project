@@ -37,8 +37,8 @@ export function PostIt({ note, straightened = false, onStraighten, onEdit, onDel
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [hovered, setHovered] = useState(false)
   const rawRotation = note.rotation ?? rotationForId(note.id)
-  // Clamp server/client tilt so rotated corners don't eat the next note on mobile.
-  const rotation = Math.max(-3.5, Math.min(3.5, rawRotation))
+  // Soft clamp — full-width mobile notes make larger angles look exaggerated.
+  const rotation = Math.max(-2, Math.min(2, rawRotation))
   const offsetY = pinOffsetForId(note.id)
   const offsetX = pinOffsetXForId(note.id)
   const size = pinSizeForId(note.id)
@@ -76,7 +76,7 @@ export function PostIt({ note, straightened = false, onStraighten, onEdit, onDel
         stiffness: 320,
         damping: 22,
       }}
-      className={`postit-shadow group relative flex w-full cursor-pointer flex-col justify-between rounded-sm p-3 touch-manipulation sm:p-4 ${SIZE_CLASS[size]}`}
+      className={`postit-shadow group relative flex w-full min-w-0 cursor-pointer flex-col justify-between rounded-sm p-3 touch-manipulation sm:p-4 ${SIZE_CLASS[size]}`}
       style={{ backgroundColor: note.color, zIndex: isStraight ? 20 : zBase }}
     >
       <div className="pin-shadow absolute -top-3 left-1/2 -translate-x-1/2">
@@ -141,7 +141,7 @@ export function PostIt({ note, straightened = false, onStraighten, onEdit, onDel
         </div>
       ) : (
         <p
-          className="line-clamp-5 flex-1 overflow-hidden text-base leading-snug text-ink sm:text-lg"
+          className="line-clamp-5 flex-1 overflow-hidden break-words text-base leading-snug text-ink sm:text-lg"
           style={{ fontFamily: 'var(--font-hand)' }}
         >
           {note.message}

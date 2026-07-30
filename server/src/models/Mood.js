@@ -3,14 +3,14 @@ const { MOOD_TYPES, MOOD_COLORS } = require('../config/constants');
 
 const { Schema } = mongoose;
 
-// Deterministic slight rotation (-5deg..5deg) derived from the note's id, so
+// Deterministic slight rotation (~-2deg..2deg) derived from the note's id, so
 // the corkboard layout stays stable across re-fetches instead of jittering.
 function rotationFromId(id) {
   let hash = 0;
   for (let i = 0; i < id.length; i += 1) {
     hash = (hash * 31 + id.charCodeAt(i)) | 0;
   }
-  return Math.round(((hash % 11) - 5) * 0.9 * 10) / 10;
+  return Math.round(((hash % 11) - 5) * 0.4 * 10) / 10;
 }
 
 const moodSchema = new Schema(
