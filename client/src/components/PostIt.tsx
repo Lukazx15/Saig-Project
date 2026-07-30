@@ -77,7 +77,7 @@ export function PostIt({ note, straightened = false, onStraighten, onEdit, onDel
         damping: 22,
       }}
       className={`postit-shadow group relative flex w-full min-w-0 cursor-pointer flex-col justify-between rounded-sm p-3 touch-manipulation sm:p-4 ${SIZE_CLASS[size]}`}
-      style={{ backgroundColor: note.color, zIndex: isStraight ? 20 : zBase }}
+      style={{ backgroundColor: meta.color, zIndex: isStraight ? 20 : zBase }}
     >
       <div className="pin-shadow absolute -top-3 left-1/2 -translate-x-1/2">
         <PinIcon className="h-6 w-6" />

@@ -269,8 +269,8 @@ export function isMoodType(value: unknown): value is MoodType {
   return typeof value === 'string' && (MOOD_TYPES as readonly string[]).includes(value)
 }
 
-export function colorForMood(moodType: MoodType, override?: string): string {
-  if (override && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(override)) return override
+/** Resolve paper/legend color from moodType. Client palette is source of truth. */
+export function colorForMood(moodType: MoodType): string {
   return MOOD_META[moodType].color
 }
 

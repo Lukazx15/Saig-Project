@@ -95,7 +95,7 @@ export function normalizeMood(raw: unknown): MoodNote {
     id: pickString(r.id, r._id),
     moodType,
     message: pickString(r.message, r.content, r.text, r.body),
-    color: colorForMood(moodType, pickString(r.color) || undefined),
+    color: colorForMood(moodType),
     alias: pickString(r.alias, r.anonymousAlias, r.displayName, 'Anonymous Student'),
     faculty: pickString(r.faculty, author.faculty),
     major: pickString(r.major, author.major),
