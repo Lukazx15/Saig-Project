@@ -42,7 +42,9 @@ jobs:
           cache: npm
           cache-dependency-path: client/package-lock.json
       - run: npm ci
-      - run: npm audit --audit-level=high
+      - run: npm run audit
+        env:
+          NPM_AUDIT_LEVEL: high
       - run: npm run build
         env:
           VITE_API_URL: http://localhost:4000
