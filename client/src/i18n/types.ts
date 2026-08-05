@@ -32,6 +32,7 @@ export type MessageKey =
   | 'registerLoading'
   | 'registerEmail'
   | 'registerFaculty'
+  | 'registerFacultyFromId'
   | 'registerYear'
   | 'registerMajor'
   | 'registerSelect'

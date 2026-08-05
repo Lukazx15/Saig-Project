@@ -1,7 +1,10 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const env = require('../config/env');
-const { inferYearOfStudyFromStudentId } = require('./kmitlVerify');
+const {
+  inferYearOfStudyFromStudentId,
+  inferFacultyFromStudentId,
+} = require('./kmitlVerify');
 
 /**
  * KMITL SSO via OpenID Connect (Keycloak realm "kmitl").
@@ -124,8 +127,8 @@ async function fetchUserInfo(accessToken) {
 /**
  * Extracts the KMITL identity from OIDC userinfo claims. Student emails are
  * `<8-digit-studentId>@kmitl.ac.th`, so the studentId can be derived from
- * the email/username claim. Year of study is not in userinfo — it is
- * estimated from the student ID entry-year prefix.
+ * the email/username claim. Year and faculty are not in userinfo — year is
+ * estimated from the entry-year prefix; faculty from digits 3–4.
  */
 function extractIdentity(userInfo) {
   const email = String(userInfo.email || userInfo.preferred_username || '').toLowerCase().trim();
@@ -137,6 +140,7 @@ function extractIdentity(userInfo) {
     name,
     studentId,
     year: studentId ? inferYearOfStudyFromStudentId(studentId) : null,
+    faculty: studentId ? inferFacultyFromStudentId(studentId) : null,
   };
 }
 
@@ -144,7 +148,7 @@ function extractIdentity(userInfo) {
  * Short-lived signed ticket handed to the register page when an
  * SSO-verified student does not have a local account yet. Registration
  * presents it back so the server can trust studentId/email/year without a
- * format re-check.
+ * format re-check. Faculty is recomputed from studentId on verify.
  */
 function createSsoTicket({ studentId, email, year }) {
   return jwt.sign(
@@ -159,7 +163,13 @@ function verifySsoTicket(ticket) {
   if (payload.purpose !== 'kmitl-sso-register') throw new Error('Invalid ticket purpose');
   const year =
     typeof payload.year === 'number' && Number.isInteger(payload.year) ? payload.year : null;
-  return { studentId: payload.studentId, email: payload.email, year };
+  const studentId = payload.studentId;
+  return {
+    studentId,
+    email: payload.email,
+    year,
+    faculty: inferFacultyFromStudentId(studentId),
+  };
 }
 
 module.exports = {
