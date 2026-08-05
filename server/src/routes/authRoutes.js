@@ -179,7 +179,7 @@ router.get('/me', authenticate, authController.me);
  *     tags: [Auth]
  *     responses:
  *       200:
- *         description: Attested studentId, email, and optional year
+ *         description: Attested studentId, email, optional year, and faculty from student ID
  *         content:
  *           application/json:
  *             schema:
@@ -192,6 +192,7 @@ router.get('/me', authenticate, authController.me);
  *                     studentId: { type: string, example: "65010001" }
  *                     email: { type: string, example: "65010001@kmitl.ac.th" }
  *                     year: { type: integer, nullable: true, example: 2 }
+ *                     faculty: { type: string, nullable: true, example: "คณะวิศวกรรมศาสตร์" }
  *       400:
  *         description: Missing, invalid, or expired SSO ticket cookie
  *         content:

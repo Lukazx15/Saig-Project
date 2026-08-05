@@ -71,13 +71,23 @@ const register = asyncHandler(async (req, res) => {
     throw ApiError.badRequest('Submitted year of study does not match the KMITL SSO login');
   }
 
+  // Faculty is derived from student ID digits 3–4 when the code is known;
+  // reject attempts to pick a different faculty from the dropdown.
+  const effectiveFaculty = attested.faculty || faculty;
+  if (attested.faculty && String(faculty).trim() !== attested.faculty) {
+    throw ApiError.badRequest('Submitted faculty does not match the student ID', {
+      expected: attested.faculty,
+      submitted: faculty,
+    });
+  }
+
   let canonical;
   try {
-    canonical = normalizeFacultyMajor(faculty, major);
+    canonical = normalizeFacultyMajor(effectiveFaculty, major);
   } catch (err) {
     throw ApiError.badRequest('Invalid faculty or major', {
       reason: err.message,
-      faculty,
+      faculty: effectiveFaculty,
       major,
     });
   }
@@ -318,6 +328,7 @@ const ssoPrefill = asyncHandler(async (req, res) => {
       studentId: attested.studentId,
       email: attested.email,
       year: attested.year,
+      faculty: attested.faculty,
     },
   });
 });
