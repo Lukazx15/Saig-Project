@@ -2,7 +2,7 @@
   "name": "saig-project",
   "version": "0.1.0",
   "private": true,
-  "description": "Mood of the Major — anonymous campus mood corkboard (client + server monorepo)",
+  "description": "Mood of the Major \u2014 anonymous campus mood corkboard (client + server monorepo)",
   "scripts": {
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
@@ -11,6 +11,6 @@
     "docker:down": "docker compose down"
   },
   "engines": {
-    "node": ">=22.22.0"
+    "node": ">=20"
   }
 }

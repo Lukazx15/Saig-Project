@@ -1,4 +1,4 @@
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import { Layout } from '@/components/Layout'
 import { PinIcon } from '@/components/PinIcon'
 import { useLocale } from '@/context/LocaleContext'
