@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router'
 import { Layout } from '@/components/Layout'
 import { FilterBar } from '@/components/FilterBar'
 import { PostIt } from '@/components/PostIt'

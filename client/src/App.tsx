@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router'
 import { AuthProvider } from '@/context/AuthContext'
 import { MoodProvider } from '@/context/MoodContext'
 import { ProtectedRoute } from '@/components/ProtectedRoute'

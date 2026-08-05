@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router'
 import { Layout } from '@/components/Layout'
 import { AuthCard } from '@/components/AuthCard'
 import { useLocale } from '@/context/LocaleContext'
