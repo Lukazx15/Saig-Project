@@ -1,6 +1,7 @@
-import { useState, type PointerEvent } from 'react'
+import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { motion } from 'framer-motion'
 import { PinIcon } from '@/components/PinIcon'
+import { ViewNoteModal } from '@/components/ViewNoteModal'
 import { MOOD_META, pinOffsetForId, pinOffsetXForId, pinSizeForId, rotationForId } from '@/lib/moods'
 import type { MoodNote } from '@/types'
 import { useLocale } from '@/context/LocaleContext'
@@ -36,6 +37,9 @@ export function PostIt({ note, straightened = false, onStraighten, onEdit, onDel
   const { t, locale } = useLocale()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [hovered, setHovered] = useState(false)
+  const [isTruncated, setIsTruncated] = useState(false)
+  const [isViewOpen, setIsViewOpen] = useState(false)
+  const messageRef = useRef<HTMLParagraphElement>(null)
   const rawRotation = note.rotation ?? rotationForId(note.id)
   // Soft clamp — full-width mobile notes make larger angles look exaggerated.
   const rotation = Math.max(-2, Math.min(2, rawRotation))
@@ -44,10 +48,35 @@ export function PostIt({ note, straightened = false, onStraighten, onEdit, onDel
   const size = pinSizeForId(note.id)
   const meta = MOOD_META[note.moodType]
   const zBase = (Math.abs(pinOffsetForId(note.id)) % 5) + 1
-  const isStraight = straightened || hovered || confirmDelete
+  const isStraight = straightened || hovered || confirmDelete || isViewOpen
+
+  useEffect(() => {
+    const el = messageRef.current
+    if (!el || confirmDelete) {
+      setIsTruncated(false)
+      return
+    }
+
+    const check = () => {
+      setIsTruncated(el.scrollHeight > el.clientHeight + 1)
+    }
+
+    check()
+    const observer = new ResizeObserver(check)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [note.message, confirmDelete, size])
 
   function handlePointerUp(event: PointerEvent<HTMLElement>) {
     if ((event.target as HTMLElement).closest('button')) return
+    if (confirmDelete) return
+
+    // Overflowed text → open full note (mouse click or tap).
+    if (isTruncated) {
+      setIsViewOpen(true)
+      return
+    }
+
     // Touch / pen: tap toggles straighten (hover does not work on mobile).
     if (event.pointerType === 'touch' || event.pointerType === 'pen') {
       onStraighten?.(note)
@@ -78,6 +107,8 @@ export function PostIt({ note, straightened = false, onStraighten, onEdit, onDel
       }}
       className={`postit-shadow group relative flex w-full min-w-0 cursor-pointer flex-col justify-between rounded-sm p-3 touch-manipulation sm:p-4 ${SIZE_CLASS[size]}`}
       style={{ backgroundColor: meta.color, zIndex: isStraight ? 20 : zBase }}
+      title={isTruncated ? t('postItViewFull') : undefined}
+      aria-label={isTruncated ? t('postItViewFull') : undefined}
     >
       <div className="pin-shadow absolute -top-3 left-1/2 -translate-x-1/2">
         <PinIcon className="h-6 w-6" />
@@ -141,6 +172,7 @@ export function PostIt({ note, straightened = false, onStraighten, onEdit, onDel
         </div>
       ) : (
         <p
+          ref={messageRef}
           className="line-clamp-5 flex-1 overflow-hidden break-words text-base leading-snug text-ink sm:text-lg"
           style={{ fontFamily: 'var(--font-hand)' }}
         >
@@ -155,6 +187,12 @@ export function PostIt({ note, straightened = false, onStraighten, onEdit, onDel
       {note.faculty ? (
         <div className="truncate text-[10px] text-ink-soft/60">{note.faculty}</div>
       ) : null}
+
+      <ViewNoteModal
+        note={note}
+        isOpen={isViewOpen}
+        onClose={() => setIsViewOpen(false)}
+      />
     </motion.article>
   )
 }

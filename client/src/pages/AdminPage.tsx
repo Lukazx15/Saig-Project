@@ -65,15 +65,15 @@ function AdminNoteCard({
         </div>
 
         <p
-          className="text-base leading-snug text-ink sm:text-lg"
+          className="overflow-hidden break-words text-base leading-snug text-ink sm:text-lg"
           style={{ fontFamily: 'var(--font-hand)' }}
         >
           {note.message}
         </p>
 
         <div className="space-y-0.5 text-xs text-ink-soft sm:text-sm">
-          <p className="font-medium text-ink-soft">{note.alias}</p>
-          {facultyLine ? <p className="text-ink-soft/75">{facultyLine}</p> : null}
+          <p className="truncate font-medium text-ink-soft">{note.alias}</p>
+          {facultyLine ? <p className="break-words text-ink-soft/75">{facultyLine}</p> : null}
         </div>
       </div>
 

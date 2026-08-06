@@ -125,4 +125,6 @@ export const th: Messages = {
 
   postItEdit: 'แก้',
   postItDelete: 'ลบ',
+  postItViewFull: 'ดูข้อความเต็ม',
+  postItClose: 'ปิด',
 }

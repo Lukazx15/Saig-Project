@@ -109,5 +109,7 @@ export type MessageKey =
   | 'notFoundBack'
   | 'postItEdit'
   | 'postItDelete'
+  | 'postItViewFull'
+  | 'postItClose'
 
 export type Messages = Record<MessageKey, string>

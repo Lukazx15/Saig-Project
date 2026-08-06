@@ -122,4 +122,6 @@ export const en: Messages = {
 
   postItEdit: 'Edit',
   postItDelete: 'Delete',
+  postItViewFull: 'View full note',
+  postItClose: 'Close',
 }
