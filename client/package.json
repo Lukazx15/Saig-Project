@@ -16,7 +16,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-hook-form": "^7.69.0",
-    "react-router-dom": "^7.11.0",
+    "react-router-dom": "6.30.4",
     "zod": "^4.2.1"
   },
   "devDependencies": {
@@ -29,5 +29,8 @@
     "tailwindcss": "^4.1.18",
     "typescript": "~6.0.2",
     "vite": "^8.1.1"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

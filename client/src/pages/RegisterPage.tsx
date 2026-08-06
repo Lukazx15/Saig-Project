@@ -39,6 +39,7 @@ export function RegisterPage() {
           studentId: identity.studentId,
           email: identity.email,
           ...(identity.year != null ? { year: identity.year } : {}),
+          ...(identity.faculty ? { faculty: identity.faculty } : {}),
         })
       })
       .finally(() => {
@@ -53,6 +54,7 @@ export function RegisterPage() {
   const selectedYear = watch('year')
   const majorChoices = selectedFaculty ? majorsForFaculty(selectedFaculty) : []
   const yearLocked = Boolean(ssoIdentity && ssoIdentity.year != null)
+  const facultyLocked = Boolean(ssoIdentity?.faculty)
 
   async function onSubmit(values: RegisterFormValues) {
     setSubmitError(null)
@@ -162,23 +164,39 @@ export function RegisterPage() {
               <label className="auth-label" htmlFor="register-faculty">
                 {t('registerFaculty')}
               </label>
-              <select
-                {...register('faculty', {
-                  onChange: () => setValue('major', ''),
-                })}
-                id="register-faculty"
-                defaultValue=""
-                className="auth-input"
-              >
-                <option value="" disabled>
-                  {t('registerSelect')}
-                </option>
-                {KMITL_FACULTIES.map((f) => (
-                  <option key={f} value={f}>
-                    {f}
+              {facultyLocked ? (
+                <>
+                  <input type="hidden" {...register('faculty')} />
+                  <select
+                    id="register-faculty"
+                    disabled
+                    value={selectedFaculty}
+                    className="auth-input"
+                    aria-readonly="true"
+                  >
+                    <option value={selectedFaculty}>{selectedFaculty}</option>
+                  </select>
+                  <p className="mt-1 text-xs text-ink-soft">{t('registerFacultyFromId')}</p>
+                </>
+              ) : (
+                <select
+                  {...register('faculty', {
+                    onChange: () => setValue('major', ''),
+                  })}
+                  id="register-faculty"
+                  defaultValue=""
+                  className="auth-input"
+                >
+                  <option value="" disabled>
+                    {t('registerSelect')}
                   </option>
-                ))}
-              </select>
+                  {KMITL_FACULTIES.map((f) => (
+                    <option key={f} value={f}>
+                      {f}
+                    </option>
+                  ))}
+                </select>
+              )}
               {errors.faculty && (
                 <p className="mt-1 text-xs text-red-700">{errors.faculty.message}</p>
               )}

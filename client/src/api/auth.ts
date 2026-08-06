@@ -58,6 +58,7 @@ export type SsoPrefill = {
   studentId: string
   email: string
   year: number | null
+  faculty: string | null
 }
 
 /** Reads SSO-attested identity from the httpOnly ticket cookie (display only). */
@@ -73,7 +74,11 @@ export async function fetchSsoPrefill(): Promise<SsoPrefill | null> {
         typeof payload.year === 'number' && Number.isInteger(payload.year)
           ? payload.year
           : null
-      return { studentId: payload.studentId, email: payload.email, year }
+      const faculty =
+        typeof payload.faculty === 'string' && payload.faculty.trim()
+          ? payload.faculty.trim()
+          : null
+      return { studentId: payload.studentId, email: payload.email, year, faculty }
     }
     return null
   } catch {
